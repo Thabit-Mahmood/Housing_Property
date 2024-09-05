@@ -1,7 +1,8 @@
 package ui;
 // PropertyView.java
-import Project;
-import Property;
+
+import Modules.Project;
+import Modules.Property;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 

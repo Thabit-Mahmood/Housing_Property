@@ -1,3 +1,4 @@
+package Modules;
 // Property.java
 public class Property {
     private String size;

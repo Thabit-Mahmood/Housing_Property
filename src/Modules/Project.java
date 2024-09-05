@@ -1,3 +1,4 @@
+package Modules;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,10 @@ public class Project {
     // Get project name
     public String getProjectName() {
         return projectName;
+    }
+
+    public List<Property> getProperties() {
+        return properties;
     }
 
     // Add property to the project

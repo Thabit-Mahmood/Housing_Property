@@ -1,7 +1,6 @@
 package ui;
-// TransactionView.java
-import Project;
-import Transaction;
+import Modules.Project;
+import Modules.Transaction;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 

@@ -1,3 +1,4 @@
+package Modules;
 // FileHandler.java
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -11,7 +12,7 @@ public class FileHandler {
         List<Transaction> transactions = new ArrayList<>();
         String line;
 
-        try (BufferedReader br = new BufferedReader(new FileReader("../data/" + filename))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("data/" + filename))) {
             while ((line = br.readLine()) != null) {
                 // Assuming the file format is: ProjectName, Address, Size, Price
                 String[] transactionData = line.split(", ");
