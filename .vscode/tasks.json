@@ -1,0 +1,36 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+			{
+					"label": "compile",
+					"type": "shell",
+					"command": "javac",
+					"args": [
+							"-d",
+							"bin",
+							"-cp",
+							"${workspaceFolder}/lib/javafx-sdk-22.0.2/lib/*",
+							"${workspaceFolder}/src/**/*.java"
+					],
+					"group": {
+							"kind": "build",
+							"isDefault": true
+					}
+			},
+			{
+					"label": "run",
+					"dependsOn": "compile",
+					"type": "shell",
+					"command": "java",
+					"args": [
+							"-cp",
+							"bin:${workspaceFolder}/lib/javafx-sdk-22.0.2/lib/*",
+							"MainUI"
+					],
+					"group": {
+							"kind": "build",
+							"isDefault": true
+					}
+			}
+	]
+}

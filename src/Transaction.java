@@ -56,4 +56,8 @@ public class Transaction {
       System.out.println("Price: $" + price);
       System.out.println("----------------------------");
   }
+
+  public String getDetails() {
+    return String.format("Project: %s, Address: %s, Size: %s, Price: %.2f", projectName, address, size, price);
+  }
 }

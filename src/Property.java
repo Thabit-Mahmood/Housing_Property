@@ -67,5 +67,9 @@ public class Property {
         System.out.println("Address: " + address);
         System.out.println("----------------------------");
     }
+
+    public String getDetails() {
+        return String.format("Size: %s, Price: %.2f, Facilities: %s, Address: %s", size, price, facilities, address);
+    }
 }
 
