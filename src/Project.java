@@ -1,50 +1,69 @@
-// Project.java
 import java.util.ArrayList;
 import java.util.List;
 
 public class Project {
     private String projectName;
     private List<Property> properties;
+    private List<Transaction> transactions;
 
     // Constructor
     public Project(String projectName) {
         this.projectName = projectName;
         this.properties = new ArrayList<>();
+        this.transactions = new ArrayList<>();
     }
 
-    // Getters
+    // Get project name
     public String getProjectName() {
         return projectName;
     }
 
-    // Method to add a property to the project
+    // Add property to the project
     public void addProperty(Property property) {
         properties.add(property);
     }
 
-    // Method to search for properties based on size, price range, and facilities
+    // Get properties based on search criteria
     public List<Property> searchProperties(String size, double minPrice, double maxPrice, String facilities) {
-        List<Property> filteredProperties = new ArrayList<>();
+        List<Property> results = new ArrayList<>();
         for (Property property : properties) {
-            if ((size == null || property.getSize().equals(size)) &&
-                (property.getPrice() >= minPrice && property.getPrice() <= maxPrice) &&
-                (facilities == null || property.getFacilities().equalsIgnoreCase(facilities))) {
-                filteredProperties.add(property);
+            boolean matches = true;
+            if (size != null && !property.getSize().equals(size)) {
+                matches = false;
+            }
+            if (property.getPrice() < minPrice || property.getPrice() > maxPrice) {
+                matches = false;
+            }
+            if (facilities != null && !property.getFacilities().contains(facilities)) {
+                matches = false;
+            }
+            if (matches) {
+                results.add(property);
             }
         }
-        return filteredProperties;
+        return results;
     }
 
-    // Method to display all properties in the project
+    // Display all properties in the project
     public void displayProperties() {
         for (Property property : properties) {
             property.displayDetails();
         }
     }
-    
-    // Method to get historical transactions (placeholder, will be updated later)
+
+    // Fetch historical transactions for the project
+    public void loadHistoricalTransactions(String filename) {
+        FileHandler fileHandler = new FileHandler();
+        transactions = fileHandler.readTransactions(filename);
+    }
+
+    // Get historical transactions (last 5 transactions)
     public List<Transaction> getHistoricalTransactions() {
-        // This will retrieve transactions in the future
-        return new ArrayList<>();
+        int size = transactions.size();
+        List<Transaction> recentTransactions = new ArrayList<>();
+        for (int i = Math.max(0, size - 5); i < size; i++) {
+            recentTransactions.add(transactions.get(i));
+        }
+        return recentTransactions;
     }
 }
