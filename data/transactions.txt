@@ -1,0 +1,3 @@
+ProjectA, 123 Street, 1500 sq ft, 300000
+ProjectA, 456 Avenue, 1600 sq ft, 320000
+ProjectB, 789 Boulevard, 1200 sq ft, 250000
