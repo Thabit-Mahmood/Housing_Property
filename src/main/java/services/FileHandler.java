@@ -3,7 +3,6 @@ package main.java.services;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-
 import main.java.model.Transaction;
 
 public class FileHandler {
@@ -13,11 +12,13 @@ public class FileHandler {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",");
-                String projectName = data[0].trim();
-                String address = data[1].trim();
-                String size = data[2].trim();
-                double price = Double.parseDouble(data[3].trim());
-                transactions.add(new Transaction(projectName, address, size, price));
+                if (data.length == 4) {
+                    String projectName = data[0].trim();
+                    String address = data[1].trim();
+                    String size = data[2].trim();
+                    double price = Double.parseDouble(data[3].trim());
+                    transactions.add(new Transaction(projectName, address, size, price));
+                }
             }
         } catch (IOException e) {
             System.out.println("Error reading file: " + e.getMessage());
@@ -28,7 +29,7 @@ public class FileHandler {
     public List<Transaction> getRecentTransactions(List<Transaction> transactions, String projectName) {
         List<Transaction> projectTransactions = new ArrayList<>();
         for (Transaction transaction : transactions) {
-            if (transaction.getProjectName().equals(projectName)) {
+            if (transaction.getProjectName().equalsIgnoreCase(projectName)) {
                 projectTransactions.add(transaction);
             }
         }
