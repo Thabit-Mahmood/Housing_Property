@@ -20,10 +20,11 @@ public class Project {
         return properties;
     }
 
-    public List<Property> getPropertiesByCriteria(String size, double minPrice, double maxPrice) {
+    public List<Property> getPropertiesByCriteria(double minSize, double maxSize, double minPrice, double maxPrice) {
         List<Property> result = new ArrayList<>();
         for (Property property : properties) {
-            if (property.getSize().equals(size) && property.getPrice() >= minPrice && property.getPrice() <= maxPrice) {
+            if (property.getSize() >= minSize && property.getSize() <= maxSize &&
+                property.getPrice() >= minPrice && property.getPrice() <= maxPrice) {
                 result.add(property);
             }
         }
