@@ -1,7 +1,6 @@
 package main.java.controller;
 
 import main.java.model.Project;
-import main.java.model.Transaction;
 import java.util.List;
 
 public class ProjectController {
