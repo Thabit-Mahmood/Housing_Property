@@ -24,13 +24,13 @@ public class PropertyController {
             .flatMap(project -> project.getProperties().stream())
             .filter(property -> {
                 try {
-                    double size = Double.parseDouble(property.getSize()); // Convert size from String to double
+                    double size = property.getSize();  // Now stored as double, no need for conversion
                     return size >= minSize && size <= maxSize &&
                            property.getPrice() >= minPrice && property.getPrice() <= maxPrice &&
                            property.getFacilities().contains(facilities) &&
                            property.getProjectName().equalsIgnoreCase(projectName);
-                } catch (NumberFormatException e) {
-                    // Handle case where size cannot be parsed as double
+                } catch (Exception e) {
+                    System.out.println("Error filtering properties: " + e.getMessage());
                     return false;
                 }
             })

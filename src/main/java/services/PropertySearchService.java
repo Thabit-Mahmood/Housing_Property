@@ -24,7 +24,7 @@ public class PropertySearchService {
     public List<Property> searchProperties(double minSize, double maxSize, double minPrice, double maxPrice) {
         List<Property> matchedProperties = new ArrayList<>();
         for (Property property : properties) {
-            double size = Double.parseDouble(property.getSize()); // Convert size from String to double
+            double size = property.getSize();
             if (size >= minSize && size <= maxSize &&
                 property.getPrice() >= minPrice && property.getPrice() <= maxPrice) {
                 matchedProperties.add(property);

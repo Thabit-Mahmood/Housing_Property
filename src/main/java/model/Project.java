@@ -24,7 +24,7 @@ public class Project {
         List<Property> result = new ArrayList<>();
         for (Property property : properties) {
             try {
-                double size = Double.parseDouble(property.getSize()); // Convert size from String to double
+                double size = property.getSize();
                 if (size >= minSize && size <= maxSize &&
                     property.getPrice() >= minPrice && property.getPrice() <= maxPrice) {
                     result.add(property);

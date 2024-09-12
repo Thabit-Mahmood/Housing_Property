@@ -25,15 +25,9 @@ public class MainView {
     }
 
     private void viewProjects() {
-        try (Scanner scanner = new Scanner(System.in)) {
-            System.out.println("Select a project:");
-            for (int i = 0; i < projects.size(); i++) {
-                System.out.println((i + 1) + ". " + projects.get(i).getProjectName());
-            }
-            int projectChoice = scanner.nextInt();
-            Project selectedProject = projects.get(projectChoice - 1);
-            ProjectView projectView = new ProjectView();
-            projectView.displayProjectDetails(selectedProject);
+        ProjectView projectView = new ProjectView();
+        for (Project project : projects) {
+            projectView.displayProjectDetails(project);
         }
     }
 
@@ -41,10 +35,10 @@ public class MainView {
         Project project1 = new Project("Project Alpha");
         Project project2 = new Project("Project Beta");
 
-        Property property1 = new Property("1200", 250000, "Pool, Gym", "Project Alpha", "123 Alpha St");
-        Property property2 = new Property("800", 150000, "Gym", "Project Alpha", "124 Alpha St");
-        Property property3 = new Property("1000", 200000, "Pool", "Project Beta", "200 Beta St");
-        Property property4 = new Property("1500", 300000, "Pool, Gym, Park", "Project Beta", "201 Beta St");
+        Property property1 = new Property(1200, 250000, "Pool, Gym", "Project Alpha", "123 Alpha St");
+        Property property2 = new Property(800, 150000, "Gym", "Project Alpha", "124 Alpha St");
+        Property property3 = new Property(1000, 200000, "Pool", "Project Beta", "200 Beta St");
+        Property property4 = new Property(1500, 300000, "Pool, Gym, Park", "Project Beta", "201 Beta St");
 
         project1.addProperty(property1);
         project1.addProperty(property2);
@@ -64,53 +58,19 @@ public class MainView {
     }
 
     private void viewPropertyDetails() {
-        try (Scanner scanner = new Scanner(System.in)) {
-            System.out.println("Select a property to view details:");
-            for (int i = 0; i < projects.size(); i++) {
-                Project project = projects.get(i);
-                System.out.println((i + 1) + ". Project: " + project.getProjectName());
-                List<Property> properties = project.getProperties();
-                for (int j = 0; j < properties.size(); j++) {
-                    System.out.println("   " + (j + 1) + ". Address: " + properties.get(j).getAddress());
-                }
+        PropertyView propertyView = new PropertyView();
+        for (Project project : projects) {
+            for (Property property : project.getProperties()) {
+                propertyView.displayPropertyDetail(property);
             }
-            int projectChoice = scanner.nextInt();
-            Project selectedProject = projects.get(projectChoice - 1);
-            List<Property> properties = selectedProject.getProperties();
-            int propertyChoice = scanner.nextInt();
-            Property selectedProperty = properties.get(propertyChoice - 1);
-            PropertyView propertyView = new PropertyView();
-            propertyView.displayPropertyDetail(selectedProperty);
         }
     }
 
     public void displayMenu() {
-        try (Scanner scanner = new Scanner(System.in)) {
-            System.out.println("Welcome to the Property Search System.");
-            System.out.println("1. Search Properties");
-            System.out.println("2. View Transactions");
-            System.out.println("3. View Projects");
-            System.out.println("4. View Property Details");
-            System.out.print("Enter your choice: ");
-            int choice = scanner.nextInt();
-
-            switch (choice) {
-                case 1:
-                    searchProperties();
-                    break;
-                case 2:
-                    viewTransactions();
-                    break;
-                case 3:
-                    viewProjects();
-                    break;
-                case 4:
-                    viewPropertyDetails();
-                    break;
-                default:
-                    System.out.println("Invalid choice.");
-            }
-        }
+        // Menu logic (simplified)
+        viewProjects();
+        viewPropertyDetails();
+        viewTransactions();
     }
 
     private void searchProperties() {
@@ -134,15 +94,10 @@ public class MainView {
 
     // Inside MainView.java, `viewTransactions` method
     private void viewTransactions() {
-        System.out.println("Select a project:");
-        for (int i = 0; i < projects.size(); i++) {
-            System.out.println((i + 1) + ". " + projects.get(i).getProjectName());
-        }
-        try (Scanner scanner = new Scanner(System.in)) {
-            int projectChoice = scanner.nextInt();
-            Project selectedProject = projects.get(projectChoice - 1);
-            transactionController.displayTransactions("transactions.txt", selectedProject.getProjectName());
-        }
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter project name: ");
+        String projectName = scanner.nextLine();
+        transactionController.fetchTransactions("transactions.txt", projectName);
     }
 
     private void selectProject() {
@@ -159,13 +114,16 @@ public class MainView {
             }
         }
     }
+    
+
     public static void main(String[] args) {
         // Initialize sample data
         List<Project> projects = new ArrayList<>();
         PropertyView propertyView = new PropertyView();
         PropertyController propertyController = new PropertyController(projects, propertyView);
-        TransactionController transactionController = new TransactionController();
-
+        TransactionView transactionView = new TransactionView();
+        TransactionController transactionController = new TransactionController(transactionView);
+        
         // Create an instance of MainView
         new MainView(propertyController, transactionController);
     }

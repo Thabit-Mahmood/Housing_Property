@@ -3,9 +3,22 @@ package services;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import model.Transaction;
 
 public class FileHandler {
+    private static final Logger logger = Logger.getLogger(FileHandler.class.getName());
+    private static FileHandler instance;
+
+    private FileHandler() {}
+
+    public static synchronized FileHandler getInstance() {
+        if (instance == null) {
+            instance = new FileHandler();
+        }
+        return instance;
+    }
+
     public List<Transaction> readTransactions(String filename) {
         List<Transaction> transactions = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
@@ -21,12 +34,13 @@ public class FileHandler {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error reading file: " + e.getMessage());
+            logger.severe("Error reading file: " + e.getMessage());
         }
         return transactions;
     }
 
-    public List<Transaction> getRecentTransactions(List<Transaction> transactions, String projectName) {
+    public List<Transaction> getRecentTransactions(String filename, String projectName) {
+        List<Transaction> transactions = readTransactions(filename);
         List<Transaction> projectTransactions = new ArrayList<>();
         for (Transaction transaction : transactions) {
             if (transaction.getProjectName().equalsIgnoreCase(projectName)) {

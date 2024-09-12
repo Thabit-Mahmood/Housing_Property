@@ -1,7 +1,7 @@
 package model;
 
 public abstract class PropertyBase {
-    protected double size;  // Changed from String to double
+    protected double size;  // Changed to double
     protected double price;
     protected String facilities;
     protected String projectName;
