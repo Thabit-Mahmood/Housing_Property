@@ -23,9 +23,15 @@ public class Project {
     public List<Property> getPropertiesByCriteria(double minSize, double maxSize, double minPrice, double maxPrice) {
         List<Property> result = new ArrayList<>();
         for (Property property : properties) {
-            if (property.getSize() >= minSize && property.getSize() <= maxSize &&
-                property.getPrice() >= minPrice && property.getPrice() <= maxPrice) {
-                result.add(property);
+            try {
+                double size = Double.parseDouble(property.getSize()); // Convert size from String to double
+                if (size >= minSize && size <= maxSize &&
+                    property.getPrice() >= minPrice && property.getPrice() <= maxPrice) {
+                    result.add(property);
+                }
+            } catch (NumberFormatException e) {
+                // Handle case where size cannot be parsed as double
+                System.out.println("Invalid size format: " + property.getSize());
             }
         }
         return result;
