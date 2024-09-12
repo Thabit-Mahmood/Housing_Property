@@ -1,9 +1,9 @@
-package main.java.services;
+package services;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import main.java.model.Transaction;
+import model.Transaction;
 
 public class FileHandler {
     public List<Transaction> readTransactions(String filename) {

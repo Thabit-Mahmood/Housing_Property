@@ -1,6 +1,6 @@
-package main.java.controller;
+package controller;
 
-import main.java.model.Project;
+import model.Project;
 import java.util.List;
 
 public class ProjectController {

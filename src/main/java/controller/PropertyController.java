@@ -1,10 +1,10 @@
-package main.java.controller;
+package controller;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import main.java.model.Project;
-import main.java.model.Property;
-import main.java.view.PropertyView;
+import model.Project;
+import model.Property;
+import view.PropertyView;
 
 public class PropertyController {
     private List<Project> projects;

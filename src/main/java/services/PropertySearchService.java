@@ -1,9 +1,9 @@
-package main.java.services;
+package services;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import main.java.model.Property;
+import model.Property;
 
 public class PropertySearchService {
     private static PropertySearchService instance;

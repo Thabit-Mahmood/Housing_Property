@@ -1,8 +1,8 @@
-package main.java.view;
+package view;
 
 import java.util.List;
-import main.java.model.Project;
-import main.java.model.Property;
+import model.Project;
+import model.Property;
 
 public class ProjectView {
     public void displayProjectDetails(Project project) {

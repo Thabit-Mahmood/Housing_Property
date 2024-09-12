@@ -1,13 +1,13 @@
-package main.java.view;
+package view;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import main.java.controller.PropertyController;
-import main.java.controller.TransactionController;
-import main.java.model.Project;
-import main.java.model.Property;
-import main.java.util.DropdownAutoSuggest;
+import controller.PropertyController;
+import controller.TransactionController;
+import model.Project;
+import model.Property;
+import util.DropdownAutoSuggest;
 
 public class MainView {
     private List<Project> projects;

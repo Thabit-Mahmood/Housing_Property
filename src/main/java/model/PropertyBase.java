@@ -1,4 +1,4 @@
-package main.java.model;
+package model;
 
 public abstract class PropertyBase {
     protected double size;  // Changed from String to double

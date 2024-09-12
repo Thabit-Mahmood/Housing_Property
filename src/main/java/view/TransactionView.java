@@ -1,7 +1,7 @@
-package main.java.view;
+package view;
 
 import java.util.List;
-import main.java.model.Transaction;
+import model.Transaction;
 
 public class TransactionView {
     public void displayTransactions(List<Transaction> transactions) {

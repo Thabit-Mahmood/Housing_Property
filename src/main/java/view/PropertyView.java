@@ -1,7 +1,7 @@
-package main.java.view;
+package view;
 
 import java.util.List;
-import main.java.model.Property;
+import model.Property;
 
 public class PropertyView {
     public void displayProperties(List<Property> properties) {
