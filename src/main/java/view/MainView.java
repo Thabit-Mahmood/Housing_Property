@@ -38,10 +38,21 @@ public class MainView {
     }
 
     private void initializeData() {
-        // Initialize sample data (e.g., add projects and properties)
-        // Example:
-        // projects.add(new Project("Project A"));
-        // projects.add(new Project("Project B"));
+        Project project1 = new Project("Project Alpha");
+        Project project2 = new Project("Project Beta");
+
+        Property property1 = new Property("1200", 250000, "Pool, Gym", "Project Alpha", "123 Alpha St");
+        Property property2 = new Property("800", 150000, "Gym", "Project Alpha", "124 Alpha St");
+        Property property3 = new Property("1000", 200000, "Pool", "Project Beta", "200 Beta St");
+        Property property4 = new Property("1500", 300000, "Pool, Gym, Park", "Project Beta", "201 Beta St");
+
+        project1.addProperty(property1);
+        project1.addProperty(property2);
+        project2.addProperty(property3);
+        project2.addProperty(property4);
+
+        projects.add(project1);
+        projects.add(project2);
     }
 
     private void initializeAutoSuggest() {
@@ -147,5 +158,15 @@ public class MainView {
                 suggestions.forEach(System.out::println);
             }
         }
+    }
+    public static void main(String[] args) {
+        // Initialize sample data
+        List<Project> projects = new ArrayList<>();
+        PropertyView propertyView = new PropertyView();
+        PropertyController propertyController = new PropertyController(projects, propertyView);
+        TransactionController transactionController = new TransactionController();
+
+        // Create an instance of MainView
+        new MainView(propertyController, transactionController);
     }
 }
