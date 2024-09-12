@@ -1,5 +1,3 @@
-### **Step 4.1: Create Documentation**
-
 **Objective**: Develop comprehensive documentation to support users and provide technical details.
 
 #### **1. User Guide**
