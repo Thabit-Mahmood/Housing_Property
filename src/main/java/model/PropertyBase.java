@@ -1,3 +1,5 @@
+package main.java.model;
+
 public abstract class PropertyBase {
   protected String size;
   protected double price;

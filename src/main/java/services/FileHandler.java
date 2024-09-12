@@ -1,5 +1,6 @@
 package main.java.services;
 
+import main.java.model.Transaction;
 import java.util.List;
 
 public class FileHandler {

@@ -1,4 +1,4 @@
-
+package main.java.model;
 
 public class Transaction {
   private String projectName;

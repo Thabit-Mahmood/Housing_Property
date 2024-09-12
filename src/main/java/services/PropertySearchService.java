@@ -1,5 +1,6 @@
 package main.java.services;
 
+import main.java.model.Property;
 import java.util.List;
 
 
