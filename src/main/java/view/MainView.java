@@ -2,37 +2,48 @@ package main.java.view;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Scanner;
+import main.java.controller.TransactionController;
 import main.java.model.Project;
-import main.java.model.Property;
 
 public class MainView {
     private List<Project> projects;
+    private TransactionController transactionController;
 
-    public MainView() {
-        projects = new ArrayList<>();
+    public MainView(TransactionController transactionController) {
+        this.projects = new ArrayList<>();
+        this.transactionController = transactionController;
         initializeData();
         displayMenu();
     }
 
     private void initializeData() {
-        // Creating sample projects and properties
-        Project projectA = new Project("Project A");
-        projectA.addProperty(new Property("1500 sq ft", 300000, "3 bedrooms, 2 bathrooms", "Project A", "123 Street"));
-        projectA.addProperty(new Property("1600 sq ft", 320000, "4 bedrooms, 3 bathrooms", "Project A", "456 Avenue"));
-
-        Project projectB = new Project("Project B");
-        projectB.addProperty(new Property("1200 sq ft", 250000, "2 bedrooms, 2 bathrooms", "Project B", "789 Boulevard"));
-
-        projects.add(projectA);
-        projects.add(projectB);
+        // Initialize sample data
     }
 
     public void displayMenu() {
-        // Display search options and results here
-    }
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Welcome to the Property Search System.");
+        System.out.println("1. Search Properties");
+        System.out.println("2. View Transactions");
+        System.out.print("Enter your choice: ");
+        int choice = scanner.nextInt();
 
-    public List<Project> getProjects() {
-        return projects;
+        switch (choice) {
+            case 1:
+                // Search Properties functionality (to be implemented)
+                break;
+            case 2:
+                System.out.println("Select a project:");
+                for (int i = 0; i < projects.size(); i++) {
+                    System.out.println((i + 1) + ". " + projects.get(i).getProjectName());
+                }
+                int projectChoice = scanner.nextInt();
+                Project selectedProject = projects.get(projectChoice - 1);
+                transactionController.displayTransactions("transactions.txt", selectedProject.getProjectName());
+                break;
+            default:
+                System.out.println("Invalid choice.");
+        }
     }
 }

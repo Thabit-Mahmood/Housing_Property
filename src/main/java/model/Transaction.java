@@ -6,16 +6,23 @@ public class Transaction {
   private String size;
   private double price;
 
-  // Getters and Setters
+  public Transaction(String projectName, String address, String size, double price) {
+      this.projectName = projectName;
+      this.address = address;
+      this.size = size;
+      this.price = price;
+  }
+
+  // Getters and setters
   public String getProjectName() { return projectName; }
-  public void setProjectName(String projectName) { this.projectName = projectName; }
-
   public String getAddress() { return address; }
-  public void setAddress(String address) { this.address = address; }
-
   public String getSize() { return size; }
-  public void setSize(String size) { this.size = size; }
-
   public double getPrice() { return price; }
-  public void setPrice(double price) { this.price = price; }
+
+  public void displayTransactionDetails() {
+      System.out.println("Project: " + projectName);
+      System.out.println("Address: " + address);
+      System.out.println("Size: " + size);
+      System.out.println("Price: $" + price);
+  }
 }
