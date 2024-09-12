@@ -16,5 +16,6 @@ public class Property extends PropertyBase {
         System.out.println("Price: $" + price);
         System.out.println("Facilities: " + facilities);
         System.out.println("Address: " + address);
+        System.out.println("--------------------------------------");
     }
 }

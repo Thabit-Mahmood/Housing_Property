@@ -17,11 +17,12 @@ public class MainView {
     private Scanner scanner;
 
     public MainView(PropertyController propertyController, TransactionController transactionController) {
-        projects = new ArrayList<>();
+        this.projects = new ArrayList<>();  // Initialize the list here
         this.propertyController = propertyController;
         this.transactionController = transactionController;
-        this.scanner = new Scanner(System.in);
-        initializeData();
+        this.scanner = new Scanner(System.in);  // Initialize Scanner once
+        initializeData();  // This will populate the projects list
+        this.propertyController.setProjects(projects);  // Pass the populated list to the controller
         initializeAutoSuggest();
         displayMenu();
     }
@@ -33,7 +34,17 @@ public class MainView {
         }
     }
 
+    private void viewPropertyDetails() {
+        PropertyView propertyView = new PropertyView();
+        for (Project project : projects) {
+            for (Property property : project.getProperties()) {
+                propertyView.displayPropertyDetail(property);
+            }
+        }
+    }
+
     private void initializeData() {
+        // Initialize sample projects and properties
         Project project1 = new Project("Project Alpha");
         Project project2 = new Project("Project Beta");
 
@@ -49,6 +60,15 @@ public class MainView {
 
         projects.add(project1);
         projects.add(project2);
+
+        // Debugging output to confirm projects are initialized
+        System.out.println("Projects initialized:");
+        for (Project project : projects) {
+            System.out.println("Project: " + project.getProjectName());
+            for (Property property : project.getProperties()) {
+                System.out.println("Property: " + property.getAddress() + " | Size: " + property.getSize() + " | Price: " + property.getPrice());
+            }
+        }
     }
 
     private void initializeAutoSuggest() {
@@ -59,19 +79,11 @@ public class MainView {
         dropdownAutoSuggest = new DropdownAutoSuggest(projectNames);
     }
 
-    private void viewPropertyDetails() {
-        PropertyView propertyView = new PropertyView();
-        for (Project project : projects) {
-            for (Property property : project.getProperties()) {
-                propertyView.displayPropertyDetail(property);
-            }
-        }
-    }
-
     public void displayMenu() {
         boolean running = true;
 
         while (running) {
+            System.out.println("--------------------------------------");  // Debugging output
             System.out.println("Welcome to the Property Search System.");
             System.out.println("1. View Projects");
             System.out.println("2. View Property Details");
@@ -83,7 +95,8 @@ public class MainView {
 
             if (scanner.hasNextInt()) {
                 int choice = scanner.nextInt();
-                scanner.nextLine();
+                scanner.nextLine();  // Consume newline after nextInt()
+
                 switch (choice) {
                     case 1:
                         viewProjects();
@@ -95,7 +108,8 @@ public class MainView {
                         viewTransactions();
                         break;
                     case 4:
-                        searchProperties();
+                        System.out.println("Starting property search...");  // Debugging output
+                        searchProperties();  // Ensure search is called
                         break;
                     case 5:
                         selectProject();
@@ -108,14 +122,17 @@ public class MainView {
                 }
             } else {
                 System.out.println("Invalid input. Please enter a number.");
-                scanner.next(); 
+                scanner.next();  // Consume invalid input to avoid infinite loop
             }
         }
+
         scanner.close();
     }
 
     private void searchProperties() {
-        try (Scanner scanner = new Scanner(System.in)) {
+        try {
+            System.out.println("Collecting search criteria...");  // Debugging output
+
             System.out.print("Enter minimum size: ");
             double minSize = scanner.nextDouble();
             System.out.print("Enter maximum size: ");
@@ -124,36 +141,36 @@ public class MainView {
             double minPrice = scanner.nextDouble();
             System.out.print("Enter maximum price: ");
             double maxPrice = scanner.nextDouble();
+            scanner.nextLine();  // Consume newline
             System.out.print("Enter desired facilities: ");
-            String facilities = scanner.next();
+            String facilities = scanner.nextLine();  // Use nextLine() to capture entire line
             System.out.print("Enter project name: ");
-            String projectName = scanner.next();
-
+            String projectName = scanner.nextLine();  // Using nextLine() to capture the entire project name
+            System.out.println("--------------------------------------");  // Debugging output
+            System.out.println("Passing search criteria to controller...");  // Debugging output
             propertyController.searchProperties(minSize, maxSize, minPrice, maxPrice, facilities, projectName);
+        } catch (Exception e) {
+            System.out.println("Invalid input. Please try again.");
+            scanner.next();  // Consume invalid input
         }
     }
 
-    // Inside MainView.java, `viewTransactions` method
     private void viewTransactions() {
-        try (Scanner scanner = new Scanner(System.in)) {
-            System.out.print("Enter project name: ");
-            String projectName = scanner.nextLine();
-            transactionController.fetchTransactions("src/resources/transactions.txt", projectName);
-        }
+        System.out.print("Enter project name: ");
+        String projectName = scanner.nextLine();  // Capture the full project name
+        transactionController.fetchTransactions("src/resources/transactions.txt", projectName);
     }
 
     private void selectProject() {
-        try (Scanner scanner = new Scanner(System.in)) {
-            System.out.print("Enter project name to search: ");
-            String input = scanner.next();
+        System.out.print("Enter project name to search: ");
+        String input = scanner.nextLine();  // Use nextLine() to capture the full project name
 
-            List<String> suggestions = dropdownAutoSuggest.getSuggestions(input);
-            if (suggestions.isEmpty()) {
-                System.out.println("No matching projects found.");
-            } else {
-                System.out.println("Suggested Projects:");
-                suggestions.forEach(System.out::println);
-            }
+        List<String> suggestions = dropdownAutoSuggest.getSuggestions(input);
+        if (suggestions.isEmpty()) {
+            System.out.println("No matching projects found.");
+        } else {
+            System.out.println("Suggested Projects:");
+            suggestions.forEach(System.out::println);
         }
     }
 
