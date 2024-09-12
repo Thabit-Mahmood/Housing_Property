@@ -1,7 +1,6 @@
 package main.java.view;
 
 import java.util.List;
-
 import main.java.model.Property;
 
 public class PropertyView {
@@ -15,5 +14,9 @@ public class PropertyView {
                 System.out.println("-----");
             }
         }
+    }
+
+    public void displayPropertyDetail(Property property) {
+        property.displayPropertyDetails();
     }
 }

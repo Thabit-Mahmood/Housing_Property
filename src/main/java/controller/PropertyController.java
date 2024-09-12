@@ -15,6 +15,10 @@ public class PropertyController {
         this.propertyView = propertyView;
     }
 
+    public void displayPropertyDetails(Property property) {
+        propertyView.displayPropertyDetail(property);
+    }
+
     public void searchProperties(double minSize, double maxSize, double minPrice, double maxPrice, String facilities, String projectName) {
         List<Property> filteredProperties = projects.stream()
             .flatMap(project -> project.getProperties().stream())

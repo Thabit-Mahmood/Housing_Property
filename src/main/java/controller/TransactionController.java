@@ -1,22 +1,20 @@
 package main.java.controller;
 
-import java.util.List;
-import main.java.model.Transaction;
-import main.java.services.FileHandler;
-import main.java.view.TransactionView;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class TransactionController {
-    private FileHandler fileHandler;
-    private TransactionView transactionView;
-
-    public TransactionController(FileHandler fileHandler, TransactionView transactionView) {
-        this.fileHandler = fileHandler;
-        this.transactionView = transactionView;
-    }
-
-    public void displayTransactions(String filename, String projectName) {
-        List<Transaction> transactions = fileHandler.readTransactions(filename);
-        List<Transaction> recentTransactions = fileHandler.getRecentTransactions(transactions, projectName);
-        transactionView.displayTransactions(recentTransactions);
+    public void displayTransactions(String filePath, String projectName) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.contains(projectName)) {
+                    System.out.println(line);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading transactions: " + e.getMessage());
+        }
     }
 }
