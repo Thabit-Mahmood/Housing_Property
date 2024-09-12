@@ -1,0 +1,10 @@
+Project Alpha, 123 Alpha St, 1200 sq ft, 250000
+Project Alpha, 124 Alpha St, 800 sq ft, 150000
+Project Beta, 200 Beta St, 1000 sq ft, 200000
+Project Beta, 201 Beta St, 1500 sq ft, 300000
+Project Gamma, 321 Gamma St, 1300 sq ft, 280000
+Project Alpha, 125 Alpha St, 950 sq ft, 170000
+Project Beta, 202 Beta St, 1100 sq ft, 220000
+Project Gamma, 322 Gamma St, 1400 sq ft, 290000
+Project Alpha, 126 Alpha St, 850 sq ft, 160000
+Project Beta, 203 Beta St, 1350 sq ft, 260000

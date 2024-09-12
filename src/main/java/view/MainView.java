@@ -14,11 +14,13 @@ public class MainView {
     private PropertyController propertyController;
     private TransactionController transactionController;
     private DropdownAutoSuggest dropdownAutoSuggest;
+    private Scanner scanner;
 
     public MainView(PropertyController propertyController, TransactionController transactionController) {
         projects = new ArrayList<>();
         this.propertyController = propertyController;
         this.transactionController = transactionController;
+        this.scanner = new Scanner(System.in);
         initializeData();
         initializeAutoSuggest();
         displayMenu();
@@ -67,10 +69,49 @@ public class MainView {
     }
 
     public void displayMenu() {
-        // Menu logic (simplified)
-        viewProjects();
-        viewPropertyDetails();
-        viewTransactions();
+        boolean running = true;
+
+        while (running) {
+            System.out.println("Welcome to the Property Search System.");
+            System.out.println("1. View Projects");
+            System.out.println("2. View Property Details");
+            System.out.println("3. View Transactions");
+            System.out.println("4. Search Properties");
+            System.out.println("5. Select Project");
+            System.out.println("6. Exit");
+            System.out.print("Enter your choice: ");
+
+            if (scanner.hasNextInt()) {
+                int choice = scanner.nextInt();
+                scanner.nextLine();
+                switch (choice) {
+                    case 1:
+                        viewProjects();
+                        break;
+                    case 2:
+                        viewPropertyDetails();
+                        break;
+                    case 3:
+                        viewTransactions();
+                        break;
+                    case 4:
+                        searchProperties();
+                        break;
+                    case 5:
+                        selectProject();
+                        break;
+                    case 6:
+                        running = false;
+                        break;
+                    default:
+                        System.out.println("Invalid choice. Please try again.");
+                }
+            } else {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.next(); 
+            }
+        }
+        scanner.close();
     }
 
     private void searchProperties() {
@@ -94,10 +135,11 @@ public class MainView {
 
     // Inside MainView.java, `viewTransactions` method
     private void viewTransactions() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter project name: ");
-        String projectName = scanner.nextLine();
-        transactionController.fetchTransactions("transactions.txt", projectName);
+        try (Scanner scanner = new Scanner(System.in)) {
+            System.out.print("Enter project name: ");
+            String projectName = scanner.nextLine();
+            transactionController.fetchTransactions("src/resources/transactions.txt", projectName);
+        }
     }
 
     private void selectProject() {
@@ -114,7 +156,6 @@ public class MainView {
             }
         }
     }
-    
 
     public static void main(String[] args) {
         // Initialize sample data
@@ -123,7 +164,7 @@ public class MainView {
         PropertyController propertyController = new PropertyController(projects, propertyView);
         TransactionView transactionView = new TransactionView();
         TransactionController transactionController = new TransactionController(transactionView);
-        
+
         // Create an instance of MainView
         new MainView(propertyController, transactionController);
     }
