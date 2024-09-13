@@ -1,19 +1,22 @@
 package controller;
 
-import java.util.List;
+import model.Transaction;
 import services.FileHandler;
 import view.TransactionView;
-import model.Transaction;
+
+import java.util.List;
 
 public class TransactionController {
     private TransactionView transactionView;
+    private FileHandler fileHandler;
 
     public TransactionController(TransactionView transactionView) {
         this.transactionView = transactionView;
+        this.fileHandler = new FileHandler();
     }
 
-    public void fetchTransactions(String filePath, String projectName) {
-        List<Transaction> transactions = FileHandler.getInstance().getRecentTransactions(filePath, projectName);
-        transactionView.displayTransactions(transactions);
+    public List<String> fetchTransactions(String filePath, String projectName) {
+        List<Transaction> transactions = fileHandler.getRecentTransactions(filePath, projectName);
+        return transactionView.displayTransactions(transactions);
     }
 }

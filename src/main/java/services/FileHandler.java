@@ -10,7 +10,7 @@ public class FileHandler {
     private static final Logger logger = Logger.getLogger(FileHandler.class.getName());
     private static FileHandler instance;
 
-    private FileHandler() {}
+    public FileHandler() {}
 
     public static synchronized FileHandler getInstance() {
         if (instance == null) {

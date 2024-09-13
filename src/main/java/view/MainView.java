@@ -1,50 +1,126 @@
 package view;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
 import controller.PropertyController;
 import controller.TransactionController;
 import model.Project;
 import model.Property;
-import util.DropdownAutoSuggest;
 
-public class MainView {
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainView extends Application {
+
     private List<Project> projects;
     private PropertyController propertyController;
     private TransactionController transactionController;
-    private DropdownAutoSuggest dropdownAutoSuggest;
-    private Scanner scanner;
+    private TableView<Property> table;
+    private TextArea transactionArea;
 
-    public MainView(PropertyController propertyController, TransactionController transactionController) {
-        this.projects = new ArrayList<>();  // Initialize the list here
-        this.propertyController = propertyController;
-        this.transactionController = transactionController;
-        this.scanner = new Scanner(System.in);  // Initialize Scanner once
-        initializeData();  // This will populate the projects list
-        this.propertyController.setProjects(projects);  // Pass the populated list to the controller
-        initializeAutoSuggest();
-        displayMenu();
-    }
+    @Override
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle("Property Search System");
 
-    private void viewProjects() {
-        ProjectView projectView = new ProjectView();
-        for (Project project : projects) {
-            projectView.displayProjectDetails(project);
-        }
-    }
+        projects = new ArrayList<>();
+        initializeProjects(); 
 
-    private void viewPropertyDetails() {
-        PropertyView propertyView = new PropertyView();
-        for (Project project : projects) {
-            for (Property property : project.getProperties()) {
-                propertyView.displayPropertyDetail(property);
+        propertyController = new PropertyController(projects, new PropertyView());
+        transactionController = new TransactionController(new TransactionView());
+
+        Label projectLabel = new Label("Project Name:");
+        ComboBox<String> projectDropdown = new ComboBox<>();
+        projectDropdown.getItems().addAll(getProjectNames());
+
+        Label minSizeLabel = new Label("Minimum Size:");
+        TextField minSizeInput = new TextField();
+
+        Label maxSizeLabel = new Label("Maximum Size:");
+        TextField maxSizeInput = new TextField();
+
+        Label minPriceLabel = new Label("Minimum Price:");
+        TextField minPriceInput = new TextField();
+
+        Label maxPriceLabel = new Label("Maximum Price:");
+        TextField maxPriceInput = new TextField();
+
+        Label facilitiesLabel = new Label("Facilities:");
+        TextField facilitiesInput = new TextField();
+
+        Button searchButton = new Button("Search Properties");
+
+        table = new TableView<>();
+        initializeTableView();
+
+        Label propertyDetailsLabel = new Label();
+        table.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                Property selectedProperty = newSelection;
+                propertyDetailsLabel.setText("Project: " + selectedProperty.getProjectName() +
+                        "\nSize: " + selectedProperty.getSize() + " sq ft" +
+                        "\nPrice: $" + selectedProperty.getPrice() +
+                        "\nFacilities: " + selectedProperty.getFacilities() +
+                        "\nAddress: " + selectedProperty.getAddress());
             }
-        }
+        });
+
+        searchButton.setOnAction(e -> {
+            String projectName = projectDropdown.getValue();
+            double minSize = Double.parseDouble(minSizeInput.getText());
+            double maxSize = Double.parseDouble(maxSizeInput.getText());
+            double minPrice = Double.parseDouble(minPriceInput.getText());
+            double maxPrice = Double.parseDouble(maxPriceInput.getText());
+            String facilities = facilitiesInput.getText();
+
+            List<Property> results = propertyController.searchProperties(minSize, maxSize, minPrice, maxPrice,
+                    facilities, projectName);
+            updateTable(results);
+        });
+
+        Button viewTransactionsButton = new Button("View Transactions");
+        viewTransactionsButton.setOnAction(e -> {
+            String projectName = projectDropdown.getValue();
+            List<String> transactions = transactionController.fetchTransactions("src/resources/transactions.txt", projectName);
+            transactionArea.setText(String.join("\n", transactions));
+        });
+
+        transactionArea = new TextArea();
+        transactionArea.setEditable(false);
+
+        GridPane formLayout = new GridPane();
+        formLayout.setPadding(new Insets(10));
+        formLayout.setHgap(10);
+        formLayout.setVgap(10);
+        formLayout.add(projectLabel, 0, 0);
+        formLayout.add(projectDropdown, 1, 0);
+        formLayout.add(minSizeLabel, 0, 1);
+        formLayout.add(minSizeInput, 1, 1);
+        formLayout.add(maxSizeLabel, 0, 2);
+        formLayout.add(maxSizeInput, 1, 2);
+        formLayout.add(minPriceLabel, 0, 3);
+        formLayout.add(minPriceInput, 1, 3);
+        formLayout.add(maxPriceLabel, 0, 4);
+        formLayout.add(maxPriceInput, 1, 4);
+        formLayout.add(facilitiesLabel, 0, 5);
+        formLayout.add(facilitiesInput, 1, 5);
+        formLayout.add(searchButton, 1, 6);
+        formLayout.add(viewTransactionsButton, 1, 7);
+
+        VBox mainLayout = new VBox(20);
+        mainLayout.setPadding(new Insets(20));
+        mainLayout.getChildren().addAll(formLayout, table, transactionArea);
+
+        Scene scene = new Scene(mainLayout, 800, 600);
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
-    private void initializeData() {
-        // Initialize sample projects and properties
+    private void initializeProjects() {
         Project project1 = new Project("Project Alpha");
         Project project2 = new Project("Project Beta");
 
@@ -60,129 +136,39 @@ public class MainView {
 
         projects.add(project1);
         projects.add(project2);
-
-        // Debugging output to confirm projects are initialized
-        System.out.println("Projects initialized:");
-        for (Project project : projects) {
-            System.out.println("Project: " + project.getProjectName());
-            for (Property property : project.getProperties()) {
-                System.out.println("Property: " + property.getAddress() + " | Size: " + property.getSize() + " | Price: " + property.getPrice());
-            }
-        }
     }
 
-    private void initializeAutoSuggest() {
+    private List<String> getProjectNames() {
         List<String> projectNames = new ArrayList<>();
         for (Project project : projects) {
             projectNames.add(project.getProjectName());
         }
-        dropdownAutoSuggest = new DropdownAutoSuggest(projectNames);
+        return projectNames;
     }
 
-    public void displayMenu() {
-        boolean running = true;
+    @SuppressWarnings("unchecked")
+    private void initializeTableView() {
+        TableColumn<Property, String> addressColumn = new TableColumn<>("Address");
+        addressColumn.setCellValueFactory(new PropertyValueFactory<>("address"));
 
-        while (running) {
-            System.out.println("--------------------------------------");  // Debugging output
-            System.out.println("Welcome to the Property Search System.");
-            System.out.println("1. View Projects");
-            System.out.println("2. View Property Details");
-            System.out.println("3. View Transactions");
-            System.out.println("4. Search Properties");
-            System.out.println("5. Select Project");
-            System.out.println("6. Exit");
-            System.out.print("Enter your choice: ");
+        TableColumn<Property, Double> sizeColumn = new TableColumn<>("Size (sq ft)");
+        sizeColumn.setCellValueFactory(new PropertyValueFactory<>("size"));
 
-            if (scanner.hasNextInt()) {
-                int choice = scanner.nextInt();
-                scanner.nextLine();  // Consume newline after nextInt()
+        TableColumn<Property, Double> priceColumn = new TableColumn<>("Price ($)");
+        priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
 
-                switch (choice) {
-                    case 1:
-                        viewProjects();
-                        break;
-                    case 2:
-                        viewPropertyDetails();
-                        break;
-                    case 3:
-                        viewTransactions();
-                        break;
-                    case 4:
-                        System.out.println("Starting property search...");  // Debugging output
-                        searchProperties();  // Ensure search is called
-                        break;
-                    case 5:
-                        selectProject();
-                        break;
-                    case 6:
-                        running = false;
-                        break;
-                    default:
-                        System.out.println("Invalid choice. Please try again.");
-                }
-            } else {
-                System.out.println("Invalid input. Please enter a number.");
-                scanner.next();  // Consume invalid input to avoid infinite loop
-            }
-        }
+        TableColumn<Property, String> facilitiesColumn = new TableColumn<>("Facilities");
+        facilitiesColumn.setCellValueFactory(new PropertyValueFactory<>("facilities"));
 
-        scanner.close();
+        table.getColumns().addAll(addressColumn, sizeColumn, priceColumn, facilitiesColumn);
     }
 
-    private void searchProperties() {
-        try {
-            System.out.println("Collecting search criteria...");  // Debugging output
-
-            System.out.print("Enter minimum size: ");
-            double minSize = scanner.nextDouble();
-            System.out.print("Enter maximum size: ");
-            double maxSize = scanner.nextDouble();
-            System.out.print("Enter minimum price: ");
-            double minPrice = scanner.nextDouble();
-            System.out.print("Enter maximum price: ");
-            double maxPrice = scanner.nextDouble();
-            scanner.nextLine();  // Consume newline
-            System.out.print("Enter desired facilities: ");
-            String facilities = scanner.nextLine();  // Use nextLine() to capture entire line
-            System.out.print("Enter project name: ");
-            String projectName = scanner.nextLine();  // Using nextLine() to capture the entire project name
-            System.out.println("--------------------------------------");  // Debugging output
-            System.out.println("Passing search criteria to controller...");  // Debugging output
-            propertyController.searchProperties(minSize, maxSize, minPrice, maxPrice, facilities, projectName);
-        } catch (Exception e) {
-            System.out.println("Invalid input. Please try again.");
-            scanner.next();  // Consume invalid input
-        }
-    }
-
-    private void viewTransactions() {
-        System.out.print("Enter project name: ");
-        String projectName = scanner.nextLine();  // Capture the full project name
-        transactionController.fetchTransactions("src/resources/transactions.txt", projectName);
-    }
-
-    private void selectProject() {
-        System.out.print("Enter project name to search: ");
-        String input = scanner.nextLine();  // Use nextLine() to capture the full project name
-
-        List<String> suggestions = dropdownAutoSuggest.getSuggestions(input);
-        if (suggestions.isEmpty()) {
-            System.out.println("No matching projects found.");
-        } else {
-            System.out.println("Suggested Projects:");
-            suggestions.forEach(System.out::println);
-        }
+    private void updateTable(List<Property> searchResults) {
+        table.getItems().clear();
+        table.getItems().addAll(searchResults);
     }
 
     public static void main(String[] args) {
-        // Initialize sample data
-        List<Project> projects = new ArrayList<>();
-        PropertyView propertyView = new PropertyView();
-        PropertyController propertyController = new PropertyController(projects, propertyView);
-        TransactionView transactionView = new TransactionView();
-        TransactionController transactionController = new TransactionController(transactionView);
-
-        // Create an instance of MainView
-        new MainView(propertyController, transactionController);
+        launch(args);
     }
 }

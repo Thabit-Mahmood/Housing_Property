@@ -1,21 +1,19 @@
 package view;
 
-import java.util.List;
+import javafx.scene.control.ListView;
 import model.Project;
 import model.Property;
 
 public class ProjectView {
-    public void displayProjectDetails(Project project) {
-        System.out.println("Project: " + project.getProjectName());
-        List<Property> properties = project.getProperties();
-        if (properties.isEmpty()) {
-            System.out.println("No properties available for this project.");
-        } else {
-            System.out.println("Properties:");
-            for (Property property : properties) {
-                property.displayPropertyDetails();
-                System.out.println("-----");
-            }
+    public ListView<String> displayProjectDetails(Project project) {
+        ListView<String> projectDetailsList = new ListView<>();
+        projectDetailsList.getItems().add("Project: " + project.getProjectName());
+
+        for (Property property : project.getProperties()) {
+            projectDetailsList.getItems().add("Property: " + property.getAddress() +
+                    " | Size: " + property.getSize() + " | Price: " + property.getPrice());
         }
+
+        return projectDetailsList;
     }
 }
