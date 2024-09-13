@@ -23,7 +23,9 @@ public class FileHandler {
         List<Transaction> transactions = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
             String line;
+            System.out.println("Reading transactions from file: " + filename);
             while ((line = br.readLine()) != null) {
+                System.out.println("Processing line: " + line);
                 String[] data = line.split(",");
                 if (data.length == 4) {
                     String projectName = data[0].trim();
@@ -31,6 +33,9 @@ public class FileHandler {
                     String size = data[2].trim();
                     double price = Double.parseDouble(data[3].trim());
                     transactions.add(new Transaction(projectName, address, size, price));
+                    System.out.println("Added transaction: " + projectName + ", " + address);
+                } else {
+                    System.out.println("Invalid data format in line: " + line);
                 }
             }
         } catch (IOException e) {
