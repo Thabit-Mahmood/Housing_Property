@@ -62,6 +62,8 @@ public class PropertyController {
 
         if (!foundMatch) {
             System.out.println("No properties found matching the criteria.");
+        } else {
+            System.out.println("Search completed.");
         }
     }
 }
