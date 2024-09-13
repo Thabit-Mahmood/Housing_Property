@@ -8,6 +8,7 @@ import view.PropertyView;
 
 public class PropertyController {
     private List<Project> projects;
+    @SuppressWarnings("unused")
     private PropertyView propertyView;
 
     public PropertyController(List<Project> projects, PropertyView propertyView) {

@@ -1,6 +1,5 @@
 package view;
 
-import javafx.scene.control.ListView;
 import model.Transaction;
 
 import java.util.List;
