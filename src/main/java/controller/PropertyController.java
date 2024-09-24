@@ -1,68 +1,113 @@
 package controller;
 
-import java.util.ArrayList;
-import java.util.List;
 import model.Project;
 import model.Property;
-import view.PropertyView;
+import model.Seller;
+import services.FileHandler;
+import services.PropertyApprovalService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PropertyController {
+    private List<Property> properties;
     private List<Project> projects;
-    @SuppressWarnings("unused")
-    private PropertyView propertyView;
+    private FileHandler fileHandler;
+    private PropertyApprovalService approvalService;
 
-    public PropertyController(List<Project> projects, PropertyView propertyView) {
-        this.projects = projects;
-        this.propertyView = propertyView;
+    public PropertyController() {
+        this.properties = new ArrayList<>();
+        this.projects = new ArrayList<>();
+        this.fileHandler = FileHandler.getInstance();
+        initializePropertiesFromCSV();  // Now using CSV method
+        this.approvalService = PropertyApprovalService.getInstance();
+
+        // Log loaded properties
+        System.out.println("Properties loaded: ");
+        for (Property property : properties) {
+            System.out.println(property.getAddress() + " - " + property.getPrice() + " - " + property.getSize());
+        }
     }
 
-    public void setProjects(List<Project> projects) {
-        this.projects = projects;
+    public void addPropertyToSeller(Seller seller, Property property) {
+        seller.addProperty(property);
     }
 
-    // Updated searchProperties method to return a list of Property
-    public List<Property> searchProperties(double minSize, double maxSize, double minPrice, double maxPrice, String facilities, String projectName) {
-        List<Property> matchedProperties = new ArrayList<>();
+    public void submitPropertyForApproval(Seller seller, Property property) {
+        seller.submitPropertyForApproval(property, approvalService);
+    }
 
-        // Iterate over each project and its properties
-        for (Project project : projects) {
-            if (project.getProjectName().equalsIgnoreCase(projectName)) {
-                for (Property property : project.getProperties()) {
-                    // Check if the property matches the criteria
-                    double size = property.getSize();
-                    double price = property.getPrice();
-                    String propertyFacilities = property.getFacilities();
+    public List<Property> getSellerProperties(Seller seller) {
+        return seller.getOwnedProperties();
+    }
 
-                    boolean matchesSize = size >= minSize && size <= maxSize;
-                    boolean matchesPrice = price >= minPrice && price <= maxPrice;
+    // Method for adding a new property (used by sellers)
+    public void addProperty(Property property) {
+        Project project = getProjectByName(property.getProjectName());
+        if (project != null) {
+            project.addProperty(property);
+        } else {
+            System.out.println("Project not found!");
+        }
+        saveAllProperties();
+    }
 
-                    // Split the facilities string and match individually
-                    String[] propertyFacilitiesArray = propertyFacilities.toLowerCase().split(",\\s*");
-                    boolean matchesFacilities = false;
-                    for (String facility : propertyFacilitiesArray) {
-                        if (facility.contains(facilities.toLowerCase())) {
-                            matchesFacilities = true;
-                            break;
-                        }
-                    }
-
-                    // If all criteria match, add the property to the list
-                    if (matchesSize && matchesPrice && matchesFacilities) {
-                        matchedProperties.add(property);
-                    }
-                }
+    // Method to load properties from the CSV file and initialize them into projects
+    private void initializePropertiesFromCSV() {
+        this.properties = fileHandler.loadPropertiesFromCSV();  // Fetch properties from CSV
+        for (Property property : properties) {
+            Project project = getProjectByName(property.getProjectName());
+            if (project != null) {
+                project.addProperty(property);
+            } else {
+                // Create a new project if it doesn't exist
+                Project newProject = new Project(property.getProjectName());
+                newProject.addProperty(property);
+                projects.add(newProject);
             }
         }
-
-        // If no properties match the criteria, return an empty list
-        return matchedProperties;
     }
 
-    // New method to get a project by its name
-    public Project getProjectByName(String projectName) {
+    // Save all properties to file
+    private void saveAllProperties() {
+        List<Property> allProperties = new ArrayList<>();
+        for (Project project : projects) {
+            allProperties.addAll(project.getProperties());
+        }
+        fileHandler.savePropertiesToFile(allProperties);
+    }
+
+    // Method to filter properties based on criteria
+    public List<Property> searchPropertiesByCriteria(double minPrice, double maxPrice, double minSize, double maxSize,
+            String location) {
+        List<Property> results = new ArrayList<>();
+        for (Property property : properties) {
+            System.out.println("Checking property: " + property.getAddress()); // Log to check if properties are loaded
+            if (property.getPrice() >= minPrice && property.getPrice() <= maxPrice &&
+                    property.getSize() >= minSize && property.getSize() <= maxSize &&
+                    property.getAddress().contains(location)) {
+                results.add(property);
+                System.out.println("Matched property: " + property.getAddress()); // Log matching properties
+            }
+        }
+        return results;
+    }
+
+    // Method to search properties by project name
+    public List<Property> searchProperties(String projectName) {
+        List<Property> results = new ArrayList<>();
+        Project project = getProjectByName(projectName);
+        if (project != null) {
+            results.addAll(project.getProperties());
+        }
+        return results;
+    }
+
+    // Method to get a project by name
+    public Project getProjectByName(String name) {
         return projects.stream()
-                .filter(project -> project.getProjectName().equalsIgnoreCase(projectName))
+                .filter(project -> project.getProjectName().equalsIgnoreCase(name))
                 .findFirst()
-                .orElse(null); // Return null if no project is found
+                .orElse(null);
     }
 }

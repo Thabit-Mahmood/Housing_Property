@@ -3,13 +3,13 @@ package controller;
 import model.Transaction;
 import services.FileHandler;
 import view.TransactionView;
-
 import java.util.List;
 
 public class TransactionController {
     private TransactionView transactionView;
     private FileHandler fileHandler;  // Singleton FileHandler
 
+    // Updated constructor to accept TransactionView
     public TransactionController(TransactionView transactionView) {
         this.transactionView = transactionView;
         this.fileHandler = FileHandler.getInstance();  // Initialize the FileHandler

@@ -1,0 +1,45 @@
+/* General Styling */
+.root {
+  -fx-font-family: "Arial";
+  font-family: "Arial";
+  -fx-background-color: #f4f4f4;
+  background-color: #f4f4f4;
+}
+
+/* Button Styling */
+.button {
+  -fx-background-color: #007bff;
+  background-color: #007bff;
+  -fx-text-fill: white;
+  -fx-padding: 10px;
+  padding: 10px;
+  -fx-border-radius: 5px;
+  border-radius: 5px;
+  -fx-background-radius: 5px;
+  -fx-font-weight: bold;
+  font-weight: bold;
+}
+
+.button:hover {
+  -fx-background-color: #0056b3;
+  background-color: #0056b3;
+}
+
+/* TextField Styling */
+.text-field {
+  -fx-padding: 10px;
+  padding: 10px;
+  -fx-border-radius: 5px;
+  border-radius: 5px;
+  -fx-background-radius: 5px;
+  -fx-border-color: #dcdcdc;
+  border-color: #dcdcdc;
+}
+
+/* Label Styling */
+.label {
+  -fx-font-size: 14px;
+  font-size: 14px;
+  -fx-font-weight: bold;
+  font-weight: bold;
+}

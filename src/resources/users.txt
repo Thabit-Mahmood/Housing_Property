@@ -1,0 +1,4 @@
+john_doe,password123,Customer,johndoe@gmail.com
+jane_seller,password456,Seller,janeseller@gmail.com
+admin,password789,Admin,admin@example.com
+Thabit,123,Customer,thabit252@gmail.com
