@@ -36,9 +36,9 @@ public class UserService {
     }
     users.add(newUser);
     saveUsersToFile();  // Save the newly registered user to 'users.txt'
-}
+  }
 
-  // Authenticates a user based on username and password
+  // Authenticates a user based on username and hashed password
   public User authenticateUser(String username, String password) {
     return users.stream()
         .filter(user -> user.getUsername().equals(username) && user.getPassword().equals(password))

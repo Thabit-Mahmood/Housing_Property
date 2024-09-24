@@ -1,4 +1,3 @@
-john_doe,password123,Customer,johndoe@gmail.com
-jane_seller,password456,Seller,janeseller@gmail.com
-admin,password789,Admin,admin@example.com
-Thabit,123,Customer,thabit252@gmail.com
+customer,-1861353340,Customer,customer@gmail.com
+seller,-1861353340,Seller,seller@gmail.com
+admin,-1861353340,Admin,admin@gmail.com
