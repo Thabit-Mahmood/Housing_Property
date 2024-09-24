@@ -2,7 +2,10 @@ package services;
 
 import model.Property;
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -126,8 +129,15 @@ public class PropertyApprovalService {
     // Save an approved property to a file (CSV)
     private void saveApprovedPropertyToFile(Property property) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(approvedPropertiesFile, true))) {
-            bw.write(property.getSize() + "," + property.getPrice() + "," + property.getFacilities() + "," +
-                    property.getProjectName() + "," + property.getAddress() + "," + property.getSellerUsername());
+            String dateOfValuation = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
+            double sizeSqM = property.getSize() / 10.7639; // Convert SqFt to SqM
+            double pricePerSqFt = property.getPrice() / property.getSize();
+            String noOfFloors = "N/A"; // Placeholder for now
+
+            bw.write(String.format("%s,%.2f,%.0f,%s,%s,\"%s\",%s,%.0f,%s,%.2f,%s", 
+                    dateOfValuation, sizeSqM, property.getSize(), property.getFacilities(), noOfFloors, 
+                    property.getAddress(), property.getProjectName(), property.getPrice(), 
+                    Calendar.getInstance().get(Calendar.YEAR), pricePerSqFt, property.getSellerUsername()));
             bw.newLine();
         } catch (IOException e) {
             System.err.println("Error saving approved property to file: " + e.getMessage());

@@ -11,6 +11,7 @@ import model.Property;
 public class AdminDashboardView {
 
     private AdminController adminController;
+    @SuppressWarnings("unused")
     private TransactionController transactionController;
 
     public AdminDashboardView(AdminController adminController, TransactionController transactionController) {
