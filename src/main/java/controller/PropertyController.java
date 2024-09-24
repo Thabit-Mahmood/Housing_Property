@@ -8,6 +8,7 @@ import services.PropertyApprovalService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PropertyController {
     private List<Property> properties;
@@ -77,20 +78,16 @@ public class PropertyController {
         fileHandler.savePropertiesToFile(allProperties);
     }
 
-    // Method to filter properties based on criteria
+    // Method to filter properties based on criteria, now including facilities
     public List<Property> searchPropertiesByCriteria(double minPrice, double maxPrice, double minSize, double maxSize,
-            String location) {
-        List<Property> results = new ArrayList<>();
-        for (Property property : properties) {
-            System.out.println("Checking property: " + property.getAddress()); // Log to check if properties are loaded
-            if (property.getPrice() >= minPrice && property.getPrice() <= maxPrice &&
-                    property.getSize() >= minSize && property.getSize() <= maxSize &&
-                    property.getAddress().contains(location)) {
-                results.add(property);
-                System.out.println("Matched property: " + property.getAddress()); // Log matching properties
-            }
-        }
-        return results;
+            String location, String projectName, String facilities) {
+        return properties.stream()
+                .filter(property -> property.getPrice() >= minPrice && property.getPrice() <= maxPrice)
+                .filter(property -> property.getSize() >= minSize && property.getSize() <= maxSize)
+                .filter(property -> location.isEmpty() || property.getAddress().contains(location))
+                .filter(property -> projectName == null || property.getProjectName().equalsIgnoreCase(projectName))
+                .filter(property -> facilities.isEmpty() || property.getFacilities().toLowerCase().contains(facilities.toLowerCase()))
+                .collect(Collectors.toList());
     }
 
     // Method to search properties by project name
@@ -109,5 +106,23 @@ public class PropertyController {
                 .filter(project -> project.getProjectName().equalsIgnoreCase(name))
                 .findFirst()
                 .orElse(null);
+    }
+
+    // Method to get all project names for the dropdown/auto-suggestion
+    public List<String> getAllProjectNames() {
+        return properties.stream()
+                         .map(Property::getProjectName)
+                         .distinct()
+                         .collect(Collectors.toList());
+    }
+
+    // Modify search to include project name as criteria
+    public List<Property> searchPropertiesByCriteria(double minPrice, double maxPrice, double minSize, double maxSize, String location, String projectName) {
+        return properties.stream()
+                .filter(property -> property.getPrice() >= minPrice && property.getPrice() <= maxPrice)
+                .filter(property -> property.getSize() >= minSize && property.getSize() <= maxSize)
+                .filter(property -> location.isEmpty() || property.getAddress().contains(location))
+                .filter(property -> projectName == null || property.getProjectName().equalsIgnoreCase(projectName))
+                .collect(Collectors.toList());
     }
 }
