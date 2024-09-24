@@ -11,7 +11,6 @@ import model.Property;
 public class AdminDashboardView {
 
     private AdminController adminController;
-    @SuppressWarnings("unused")
     private TransactionController transactionController;
 
     public AdminDashboardView(AdminController adminController, TransactionController transactionController) {
@@ -25,7 +24,6 @@ public class AdminDashboardView {
         // Section for project management
         Label projectManagementLabel = new Label("Project Management");
 
-        // Create project
         TextField projectNameInput = new TextField();
         projectNameInput.setPromptText("Enter new project name");
         Button createProjectButton = new Button("Create Project");
@@ -40,7 +38,6 @@ public class AdminDashboardView {
             }
         });
 
-        // Delete project
         TextField deleteProjectInput = new TextField();
         deleteProjectInput.setPromptText("Enter project name to delete");
         Button deleteProjectButton = new Button("Delete Project");
@@ -55,7 +52,6 @@ public class AdminDashboardView {
             }
         });
 
-        // List all projects
         Button listProjectsButton = new Button("List All Projects");
         ListView<String> projectListView = new ListView<>();
         listProjectsButton.setOnAction(e -> {
@@ -68,37 +64,33 @@ public class AdminDashboardView {
         Button approvePropertyButton = new Button("Approve Property");
         Button rejectPropertyButton = new Button("Reject Property");
         Label nextPendingPropertyLabel = new Label("Next Pending Property: None");
-        
-        // Get the next pending property for review
-        Property nextPendingProperty = adminController.getPendingProperty();
-        if (nextPendingProperty != null) {
-            nextPendingPropertyLabel.setText("Next Pending Property: " + nextPendingProperty.getAddress());
-        }
+
+        updateNextPendingPropertyLabel(nextPendingPropertyLabel);
 
         // Approve the next pending property
         approvePropertyButton.setOnAction(e -> {
+            Property nextPendingProperty = adminController.approveNextProperty();
             if (nextPendingProperty != null) {
-                adminController.approveProperty(nextPendingProperty);
-                nextPendingPropertyLabel.setText("Next Pending Property: " + adminController.getPendingProperty());
+                showSuccess("Approved Property: " + nextPendingProperty.getAddress());
+                updateNextPendingPropertyLabel(nextPendingPropertyLabel); // Refresh pending property
             } else {
-                showError("No pending properties.");
+                showError("No pending properties to approve.");
             }
         });
 
         // Reject the next pending property
         rejectPropertyButton.setOnAction(e -> {
+            Property nextPendingProperty = adminController.rejectNextProperty();
             if (nextPendingProperty != null) {
-                adminController.rejectProperty(nextPendingProperty);
-                nextPendingPropertyLabel.setText("Next Pending Property: " + adminController.getPendingProperty());
+                showSuccess("Rejected Property: " + nextPendingProperty.getAddress());
+                updateNextPendingPropertyLabel(nextPendingPropertyLabel); // Refresh pending property
             } else {
-                showError("No pending properties.");
+                showError("No pending properties to reject.");
             }
         });
 
-        // Layout for property approval management
         VBox propertyApprovalLayout = new VBox(10, propertyApprovalLabel, nextPendingPropertyLabel, approvePropertyButton, rejectPropertyButton);
 
-        // Layout for entire admin dashboard
         VBox layout = new VBox(20);
         layout.getChildren().addAll(new Label("Welcome to the Admin Dashboard"), projectManagementLabel, projectNameInput, createProjectButton, deleteProjectInput, deleteProjectButton, listProjectsButton, projectListView, propertyApprovalLayout);
 
@@ -107,10 +99,29 @@ public class AdminDashboardView {
         primaryStage.show();
     }
 
+    // Update the label to show the next pending property
+    private void updateNextPendingPropertyLabel(Label label) {
+        Property nextPendingProperty = adminController.getPendingProperty();
+        if (nextPendingProperty != null) {
+            label.setText("Next Pending Property: " + nextPendingProperty.getAddress());
+        } else {
+            label.setText("Next Pending Property: None");
+        }
+    }
+
     // Show error message
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    // Show success message
+    private void showSuccess(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Success");
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();

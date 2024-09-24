@@ -41,18 +41,29 @@ public class PropertyController {
         saveAllProperties();
     }
 
+    // Associate property with seller after approval
     public void addPropertyToSeller(Seller seller, Property property) {
         seller.addProperty(property); // Add property to seller's list after admin approval
         saveAllProperties();  // Save all approved properties
     }
 
+    // Method for submitting a property for approval by a seller
     public void submitPropertyForApproval(Seller seller, Property property) {
+        property.setSellerUsername(seller.getUsername()); // Associate property with the seller
         approvalService.submitForApproval(property); // Submit property for admin approval
         fileHandler.savePendingPropertyToCSV(property); // Save to pending properties CSV file
     }
 
+    // Method to get the list of pending properties
+    public List<Property> getPendingProperties() {
+        return approvalService.getPendingProperties();  // Get all pending properties
+    }
+
+    // Get all properties owned by a specific seller
     public List<Property> getSellerProperties(Seller seller) {
-        return seller.getOwnedProperties(); // Return seller's approved properties
+        return properties.stream()
+                .filter(property -> property.getSellerUsername().equals(seller.getUsername()))
+                .collect(Collectors.toList());
     }
 
     // Initialize properties from CSV
