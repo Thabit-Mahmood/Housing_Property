@@ -1,32 +1,45 @@
 package controller;
 
 import model.Admin;
-import model.Project;
+import model.Property;
 import services.ProjectService;
+import java.util.List;
 
 public class AdminController {
-    private ProjectService projectService;  // Add a project service to handle projects
+
+    private ProjectService projectService;
 
     public AdminController(Admin admin) {
-        this.projectService = ProjectService.getInstance();  // Initialize the project service
+        this.projectService = ProjectService.getInstance();
     }
 
-    // Method to create a new project
+    // Approves a property submitted by a seller
+    public void approveProperty(Property property) {
+        projectService.approveProperty(property);
+    }
+
+    // Rejects a property submitted by a seller
+    public void rejectProperty(Property property) {
+        projectService.rejectProperty(property);
+    }
+
+    // Creates a new project
     public void createProject(String projectName) {
-        projectService.addProject(new Project(projectName));  // Admin creates a new project
-        System.out.println("Project created: " + projectName);
+        projectService.createProject(projectName);
     }
 
-    // Method to delete a project
+    // Deletes a project
     public void deleteProject(String projectName) {
-        projectService.removeProject(projectName);  // Admin deletes a project
-        System.out.println("Project deleted: " + projectName);
+        projectService.deleteProject(projectName);
     }
 
-    // Method to list all projects
-    public void listProjects() {
-        System.out.println("All Projects:");
-        projectService.getAllProjects().forEach(project -> 
-            System.out.println("- " + project.getProjectName()));
+    // List all projects
+    public List<String> listProjects() {
+        return projectService.getAllProjectNames();
+    }
+
+    // Get the next pending property for approval
+    public Property getPendingProperty() {
+        return projectService.getNextPendingProperty();
     }
 }

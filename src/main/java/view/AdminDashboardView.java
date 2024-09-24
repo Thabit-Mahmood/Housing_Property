@@ -4,62 +4,115 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import model.Transaction;
-
-import java.util.List;
-
 import controller.AdminController;
 import controller.TransactionController;
+import model.Property;
 
 public class AdminDashboardView {
 
-    private TransactionController transactionController;
-    @SuppressWarnings("unused")
     private AdminController adminController;
+    @SuppressWarnings("unused")
+    private TransactionController transactionController;
 
-    // Update the constructor to accept both AdminController and
-    // TransactionController
     public AdminDashboardView(AdminController adminController, TransactionController transactionController) {
-        this.transactionController = transactionController;
         this.adminController = adminController;
+        this.transactionController = transactionController;
     }
 
-    // Display the admin dashboard
     public void displayAdminDashboard(Stage primaryStage) {
         primaryStage.setTitle("Admin Dashboard");
 
-        // Transaction viewing section
-        Label transactionLabel = new Label("View Transactions for Project:");
+        // Section for project management
+        Label projectManagementLabel = new Label("Project Management");
+
+        // Create project
         TextField projectNameInput = new TextField();
-        projectNameInput.setPromptText("Enter project name");
+        projectNameInput.setPromptText("Enter new project name");
+        Button createProjectButton = new Button("Create Project");
 
-        Button viewTransactionsButton = new Button("View Transactions");
-        ListView<String> transactionListView = new ListView<>();
-
-        // Event handling for viewing transactions
-        viewTransactionsButton.setOnAction(e -> {
+        createProjectButton.setOnAction(e -> {
             String projectName = projectNameInput.getText();
             if (!projectName.isEmpty()) {
-                List<Transaction> transactions = transactionController.fetchTransactions(projectName); // Updated to
-                                                                                                       // pass only
-                                                                                                       // projectName
-                transactionListView.getItems().clear();
-                transactions.forEach(transaction -> transactionListView.getItems().add(transaction.toString()));
+                adminController.createProject(projectName);
+                projectNameInput.clear();
             } else {
-                transactionListView.getItems().clear();
-                transactionListView.getItems().add("Please enter a project name.");
+                showError("Please enter a valid project name.");
             }
         });
 
-        VBox transactionLayout = new VBox(10, transactionLabel, projectNameInput, viewTransactionsButton,
-                transactionListView);
+        // Delete project
+        TextField deleteProjectInput = new TextField();
+        deleteProjectInput.setPromptText("Enter project name to delete");
+        Button deleteProjectButton = new Button("Delete Project");
+
+        deleteProjectButton.setOnAction(e -> {
+            String projectName = deleteProjectInput.getText();
+            if (!projectName.isEmpty()) {
+                adminController.deleteProject(projectName);
+                deleteProjectInput.clear();
+            } else {
+                showError("Please enter a valid project name.");
+            }
+        });
+
+        // List all projects
+        Button listProjectsButton = new Button("List All Projects");
+        ListView<String> projectListView = new ListView<>();
+        listProjectsButton.setOnAction(e -> {
+            projectListView.getItems().clear();
+            projectListView.getItems().addAll(adminController.listProjects());
+        });
+
+        // Section for property approval
+        Label propertyApprovalLabel = new Label("Property Approval");
+        Button approvePropertyButton = new Button("Approve Property");
+        Button rejectPropertyButton = new Button("Reject Property");
+        Label nextPendingPropertyLabel = new Label("Next Pending Property: None");
+        
+        // Get the next pending property for review
+        Property nextPendingProperty = adminController.getPendingProperty();
+        if (nextPendingProperty != null) {
+            nextPendingPropertyLabel.setText("Next Pending Property: " + nextPendingProperty.getAddress());
+        }
+
+        // Approve the next pending property
+        approvePropertyButton.setOnAction(e -> {
+            if (nextPendingProperty != null) {
+                adminController.approveProperty(nextPendingProperty);
+                nextPendingPropertyLabel.setText("Next Pending Property: " + adminController.getPendingProperty());
+            } else {
+                showError("No pending properties.");
+            }
+        });
+
+        // Reject the next pending property
+        rejectPropertyButton.setOnAction(e -> {
+            if (nextPendingProperty != null) {
+                adminController.rejectProperty(nextPendingProperty);
+                nextPendingPropertyLabel.setText("Next Pending Property: " + adminController.getPendingProperty());
+            } else {
+                showError("No pending properties.");
+            }
+        });
+
+        // Layout for property approval management
+        VBox propertyApprovalLayout = new VBox(10, propertyApprovalLabel, nextPendingPropertyLabel, approvePropertyButton, rejectPropertyButton);
 
         // Layout for entire admin dashboard
-        VBox layout = new VBox(10);
-        layout.getChildren().addAll(new Label("Welcome to the Admin Dashboard"), transactionLayout);
+        VBox layout = new VBox(20);
+        layout.getChildren().addAll(new Label("Welcome to the Admin Dashboard"), projectManagementLabel, projectNameInput, createProjectButton, deleteProjectInput, deleteProjectButton, listProjectsButton, projectListView, propertyApprovalLayout);
 
-        Scene scene = new Scene(layout, 600, 400);
+        Scene scene = new Scene(layout, 600, 500);
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    // Show error message
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

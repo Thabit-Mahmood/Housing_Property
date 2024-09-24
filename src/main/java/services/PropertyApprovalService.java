@@ -30,6 +30,7 @@ public class PropertyApprovalService {
     public void approveProperty(Property property) {
         property.setApproved(true);
         pendingProperties.remove(property);
+        FileHandler.getInstance().savePropertiesToFile(FileHandler.getInstance().loadPropertiesFromCSV());  // Save approved properties
         System.out.println("Property approved: " + property.getAddress());
     }
 

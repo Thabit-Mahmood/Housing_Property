@@ -85,7 +85,7 @@ public class FileHandler {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(propertiesCSVPath, false))) {
             for (Property property : properties) {
                 bw.write(property.getSize() + "," + property.getPrice() + "," + property.getFacilities() + "," +
-                        property.getProjectName() + "," + property.getAddress());
+                        property.getProjectName() + "," + property.getAddress() + "," + property.getSellerUsername());
                 bw.newLine();
             }
         } catch (IOException e) {
@@ -93,50 +93,41 @@ public class FileHandler {
         }
     }
 
-    // Save pending property to file
+    // Save pending property to file with seller association
     public void savePendingPropertyToCSV(Property property) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(pendingPropertiesCSVPath, true))) {
             bw.write(property.getSize() + "," + property.getPrice() + "," + property.getFacilities() + "," +
-                    property.getProjectName() + "," + property.getAddress());
+                    property.getProjectName() + "," + property.getAddress() + "," + property.getSellerUsername());
             bw.newLine();
         } catch (IOException e) {
             logger.severe("Error saving pending property: " + e.getMessage());
         }
     }
 
-    // Load properties from a CSV file
+// Load properties from CSV file (approved properties)
     public List<Property> loadPropertiesFromCSV() {
         List<Property> properties = new ArrayList<>();
         File file = new File(propertiesCSVPath);
 
-        // Check if the file exists; if not, log error
         if (!file.exists()) {
-            logger.severe("CSV file does not exist at " + propertiesCSVPath);
+            logger.severe("Properties CSV file does not exist.");
             return properties;
         }
 
-        // Read properties from the CSV file
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
-
-            // Skip the header line
-            br.readLine(); // This will skip the first line, which is the header
-
             while ((line = br.readLine()) != null) {
-                // Split by comma, assuming no commas in values (this can be enhanced with a CSV
-                // parser)
-                String[] data = parseCSVLine(line);
-                if (data.length == 10) { // Ensure it has the expected number of fields
+                String[] data = line.split(",");
+                if (data.length == 6) { // Adjusted to 6 fields to include sellerUsername
+                    double size = Double.parseDouble(data[0].trim());
+                    double price = Double.parseDouble(data[1].trim());
+                    String facilities = data[2].trim();
+                    String projectName = data[3].trim();
+                    String address = data[4].trim();
                     @SuppressWarnings("unused")
-                    double sizeSqM = Double.parseDouble(data[1].trim());
-                    double sizeSqFt = Double.parseDouble(data[2].trim());
-                    String propertyType = data[3].trim();
-                    String address = data[5].trim();
-                    String scheme = data[6].trim();
-                    double price = Double.parseDouble(data[7].trim());
-                    String projectName = scheme; // We treat scheme as project name
+                    String sellerUsername = data[5].trim();  // Extract sellerUsername
 
-                    properties.add(new Property(sizeSqFt, price, propertyType, projectName, address));
+                    properties.add(new Property(size, price, facilities, projectName, address));
                 }
             }
         } catch (IOException e) {

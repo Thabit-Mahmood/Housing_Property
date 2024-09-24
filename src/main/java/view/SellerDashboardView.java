@@ -1,10 +1,14 @@
 package view;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.util.List;
+
 import controller.PropertyController;
 import model.Property;
 import model.Seller;
@@ -16,11 +20,13 @@ public class SellerDashboardView {
   private Seller seller;
   @SuppressWarnings("unused")
   private ProjectService projectService; // Service to get existing projects
+  @SuppressWarnings("unused")
   private ObservableList<String> projectNames; // Dropdown for existing projects
 
   public SellerDashboardView(PropertyController propertyController, Seller seller) {
     this.propertyController = propertyController;
     this.seller = seller;
+    this.projectService = ProjectService.getInstance(); // Initialize ProjectService
   }
 
   // Display the seller dashboard
@@ -38,7 +44,7 @@ public class SellerDashboardView {
     });
 
     // Add a property (selecting from existing projects)
-    ComboBox<String> projectNameDropdown = new ComboBox<>(projectNames);
+    ComboBox<String> projectNameDropdown = new ComboBox<>(); // ComboBox for project names
     projectNameDropdown.setPromptText("Select Project");
 
     // Add property form fields
@@ -51,6 +57,12 @@ public class SellerDashboardView {
     TextField facilitiesField = new TextField();
     facilitiesField.setPromptText("Facilities");
     Button submitForApprovalButton = new Button("Submit for Approval");
+
+    // Populate project names dropdown with projects from the CSV file
+    List<String> projectNames = projectService.getAllProjectNames();
+    ObservableList<String> projectOptions = FXCollections.observableArrayList(projectNames);
+    projectNameDropdown.setItems(projectOptions);
+    projectNameDropdown.setPromptText("Select Project");
 
     // Submit for approval button action
     submitForApprovalButton.setOnAction(e -> {
