@@ -18,7 +18,6 @@ public class SellerDashboardView {
 
   private PropertyController propertyController;
   private Seller seller;
-  @SuppressWarnings("unused")
   private ProjectService projectService; // Service to get existing projects
   @SuppressWarnings("unused")
   private ObservableList<String> projectNames; // Dropdown for existing projects
@@ -38,8 +37,13 @@ public class SellerDashboardView {
     Button refreshButton = new Button("View Approved Properties");
     refreshButton.setOnAction(e -> {
       propertyListView.getItems().clear();
-      for (Property property : propertyController.getSellerProperties(seller)) {
-        propertyListView.getItems().add(property.getAddress() + " | Price: $" + property.getPrice());
+      List<Property> sellerProperties = propertyController.getSellerProperties(seller);
+      if (sellerProperties.isEmpty()) {
+        propertyListView.getItems().add("No approved properties found.");
+      } else {
+        for (Property property : sellerProperties) {
+          propertyListView.getItems().add(property.getAddress() + " | Price: $" + property.getPrice());
+        }
       }
     });
 

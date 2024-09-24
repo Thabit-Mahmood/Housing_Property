@@ -61,6 +61,7 @@ public class PropertyController {
 
     // Get all properties owned by a specific seller
     public List<Property> getSellerProperties(Seller seller) {
+        this.properties = fileHandler.loadPropertiesFromCSV();  // Reload approved properties from CSV
         return properties.stream()
                 .filter(property -> property.getSellerUsername().equals(seller.getUsername()))
                 .collect(Collectors.toList());
