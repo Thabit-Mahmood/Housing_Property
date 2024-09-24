@@ -11,9 +11,11 @@ import java.util.logging.Logger;
 public class FileHandler {
     private static final Logger logger = Logger.getLogger(FileHandler.class.getName());
     private static FileHandler instance;
-    private final String propertiesCSVPath = "src/resources/properties.csv"; // CSV file path
+    private final String propertiesCSVPath = "src/resources/properties.csv"; // Properties CSV file path
+    private final String transactionsCSVPath = "src/resources/transactions.csv"; // Transactions CSV file path
 
-    public FileHandler() {}
+    public FileHandler() {
+    }
 
     public static synchronized FileHandler getInstance() {
         if (instance == null) {
@@ -22,43 +24,59 @@ public class FileHandler {
         return instance;
     }
 
-    public List<Transaction> getRecentTransactions(String filename, String projectName) {
-        List<Transaction> allTransactions = readTransactions(filename);
-        List<Transaction> projectTransactions = new ArrayList<>();
-    
-        for (Transaction transaction : allTransactions) {
-            if (transaction.getProjectName().equalsIgnoreCase(projectName)) {
-                projectTransactions.add(transaction);
-            }
-        }
-    
-        return projectTransactions.size() > 5 ? projectTransactions.subList(0, 5) : projectTransactions;
-    }
-    
-    // Read transactions from a file
-    public List<Transaction> readTransactions(String filename) {
+    // Read transactions from the CSV file
+    public List<Transaction> loadTransactionsFromCSV() {
         List<Transaction> transactions = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+        File file = new File(transactionsCSVPath);
+
+        // Check if the file exists; if not, log error
+        if (!file.exists()) {
+            logger.severe("CSV file does not exist at " + transactionsCSVPath);
+            return transactions;
+        }
+
+        // Read transactions from the CSV file
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
-            System.out.println("Reading transactions from file: " + filename);
+
+            // Skip the header line
+            br.readLine(); // Skip first line which is the header
+
             while ((line = br.readLine()) != null) {
-                System.out.println("Processing line: " + line);
-                String[] data = line.split(",");
-                if (data.length == 4) {
+                // Split by commas, handling quoted strings properly
+                String[] data = parseCSVLine(line);
+                if (data.length == 4) { // Ensure it has the expected number of fields
                     String projectName = data[0].trim();
                     String address = data[1].trim();
                     String size = data[2].trim();
                     double price = Double.parseDouble(data[3].trim());
+
                     transactions.add(new Transaction(projectName, address, size, price));
-                    System.out.println("Added transaction: " + projectName + ", " + address);
-                } else {
-                    System.out.println("Invalid data format in line: " + line);
+                    System.out.println("Loaded transaction for project: " + projectName + ", Address: " + address);
                 }
             }
         } catch (IOException e) {
-            logger.severe("Error reading file: " + e.getMessage());
+            logger.severe("Error reading transactions CSV file: " + e.getMessage());
         }
+
+        System.out.println("Total transactions loaded: " + transactions.size());
         return transactions;
+    }
+    // Save transactions to the CSV file
+    public void saveTransactionsToCSV(List<Transaction> transactions) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(transactionsCSVPath, false))) {
+            // Write header
+            bw.write("ProjectName,Address,Size,Price");
+            bw.newLine();
+
+            for (Transaction transaction : transactions) {
+                bw.write(transaction.getProjectName() + "," + transaction.getAddress() + "," +
+                        transaction.getSize() + "," + transaction.getPrice());
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            logger.severe("Error saving transactions: " + e.getMessage());
+        }
     }
 
     // Save properties to a file (for writing back to CSV)
@@ -93,7 +111,8 @@ public class FileHandler {
             br.readLine(); // This will skip the first line, which is the header
 
             while ((line = br.readLine()) != null) {
-                // Split by comma, assuming no commas in values (this can be enhanced with a CSV parser)
+                // Split by comma, assuming no commas in values (this can be enhanced with a CSV
+                // parser)
                 String[] data = parseCSVLine(line);
                 if (data.length == 10) { // Ensure it has the expected number of fields
                     @SuppressWarnings("unused")
@@ -114,7 +133,7 @@ public class FileHandler {
         return properties;
     }
 
-    // Helper method to parse CSV lines (handling commas inside fields)
+    // Helper method to parse CSV lines, handling commas inside quotes
     private String[] parseCSVLine(String line) {
         List<String> tokens = new ArrayList<>();
         boolean inQuotes = false;

@@ -4,6 +4,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import model.Transaction;
 
 import java.util.List;
 
@@ -16,7 +17,8 @@ public class AdminDashboardView {
     @SuppressWarnings("unused")
     private AdminController adminController;
 
-    // Update the constructor to accept both AdminController and TransactionController
+    // Update the constructor to accept both AdminController and
+    // TransactionController
     public AdminDashboardView(AdminController adminController, TransactionController transactionController) {
         this.transactionController = transactionController;
         this.adminController = adminController;
@@ -38,16 +40,19 @@ public class AdminDashboardView {
         viewTransactionsButton.setOnAction(e -> {
             String projectName = projectNameInput.getText();
             if (!projectName.isEmpty()) {
-                List<String> transactions = transactionController.fetchTransactions("src/resources/transactions.txt", projectName);
+                List<Transaction> transactions = transactionController.fetchTransactions(projectName); // Updated to
+                                                                                                       // pass only
+                                                                                                       // projectName
                 transactionListView.getItems().clear();
-                transactionListView.getItems().addAll(transactions);
+                transactions.forEach(transaction -> transactionListView.getItems().add(transaction.toString()));
             } else {
                 transactionListView.getItems().clear();
                 transactionListView.getItems().add("Please enter a project name.");
             }
         });
 
-        VBox transactionLayout = new VBox(10, transactionLabel, projectNameInput, viewTransactionsButton, transactionListView);
+        VBox transactionLayout = new VBox(10, transactionLabel, projectNameInput, viewTransactionsButton,
+                transactionListView);
 
         // Layout for entire admin dashboard
         VBox layout = new VBox(10);

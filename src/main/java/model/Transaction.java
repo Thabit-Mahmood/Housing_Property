@@ -14,15 +14,28 @@ public class Transaction {
     }
 
     // Getters and setters
-    public String getProjectName() { return projectName; }
-    public String getAddress() { return address; }
-    public String getSize() { return size; }
-    public double getPrice() { return price; }
+    public String getProjectName() {
+        return projectName;
+    }
 
-    public void displayTransactionDetails() {
-        System.out.println("Project: " + projectName);
-        System.out.println("Address: " + address);
-        System.out.println("Size: " + size);
-        System.out.println("Price: $" + price);
+    public String getAddress() {
+        return address;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    // Properly formatted toString() method
+    @Override
+    public String toString() {
+        return "Transaction [Project: " + projectName +
+               ", Address: " + address +
+               ", Size: " + size + " sq ft" +
+               ", Price: $" + String.format("%,.2f", price) + "]";
     }
 }

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TransactionView {
+
     // Method to format and return transactions for display
     public List<String> formatTransactionDetails(List<Transaction> transactions) {
         List<String> transactionDetails = new ArrayList<>();
