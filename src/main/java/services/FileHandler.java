@@ -96,6 +96,7 @@ public class FileHandler {
                 // Split by comma, assuming no commas in values (this can be enhanced with a CSV parser)
                 String[] data = parseCSVLine(line);
                 if (data.length == 10) { // Ensure it has the expected number of fields
+                    @SuppressWarnings("unused")
                     double sizeSqM = Double.parseDouble(data[1].trim());
                     double sizeSqFt = Double.parseDouble(data[2].trim());
                     String propertyType = data[3].trim();
