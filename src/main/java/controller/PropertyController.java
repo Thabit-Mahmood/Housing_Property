@@ -30,18 +30,6 @@ public class PropertyController {
         }
     }
 
-    public void addPropertyToSeller(Seller seller, Property property) {
-        seller.addProperty(property);
-    }
-
-    public void submitPropertyForApproval(Seller seller, Property property) {
-        seller.submitPropertyForApproval(property, approvalService);
-    }
-
-    public List<Property> getSellerProperties(Seller seller) {
-        return seller.getOwnedProperties();
-    }
-
     // Method for adding a new property (used by sellers)
     public void addProperty(Property property) {
         Project project = getProjectByName(property.getProjectName());
@@ -53,9 +41,23 @@ public class PropertyController {
         saveAllProperties();
     }
 
-    // Method to load properties from the CSV file and initialize them into projects
+    public void addPropertyToSeller(Seller seller, Property property) {
+        seller.addProperty(property); // Add property to seller's list after admin approval
+        saveAllProperties();  // Save all approved properties
+    }
+
+    public void submitPropertyForApproval(Seller seller, Property property) {
+        approvalService.submitForApproval(property); // Submit property for admin approval
+        fileHandler.savePendingPropertyToCSV(property); // Save to pending properties CSV file
+    }
+
+    public List<Property> getSellerProperties(Seller seller) {
+        return seller.getOwnedProperties(); // Return seller's approved properties
+    }
+
+    // Initialize properties from CSV
     private void initializePropertiesFromCSV() {
-        this.properties = fileHandler.loadPropertiesFromCSV();  // Fetch properties from CSV
+        this.properties = fileHandler.loadPropertiesFromCSV();  // Load approved properties from CSV
         for (Property property : properties) {
             Project project = getProjectByName(property.getProjectName());
             if (project != null) {
@@ -75,7 +77,7 @@ public class PropertyController {
         for (Project project : projects) {
             allProperties.addAll(project.getProperties());
         }
-        fileHandler.savePropertiesToFile(allProperties);
+        fileHandler.savePropertiesToFile(allProperties); // Save approved properties
     }
 
     // Method to filter properties based on criteria, now including facilities
@@ -86,7 +88,8 @@ public class PropertyController {
                 .filter(property -> property.getSize() >= minSize && property.getSize() <= maxSize)
                 .filter(property -> location.isEmpty() || property.getAddress().contains(location))
                 .filter(property -> projectName == null || property.getProjectName().equalsIgnoreCase(projectName))
-                .filter(property -> facilities.isEmpty() || property.getFacilities().toLowerCase().contains(facilities.toLowerCase()))
+                .filter(property -> facilities.isEmpty()
+                        || property.getFacilities().toLowerCase().contains(facilities.toLowerCase()))
                 .collect(Collectors.toList());
     }
 
@@ -111,13 +114,14 @@ public class PropertyController {
     // Method to get all project names for the dropdown/auto-suggestion
     public List<String> getAllProjectNames() {
         return properties.stream()
-                         .map(Property::getProjectName)
-                         .distinct()
-                         .collect(Collectors.toList());
+                .map(Property::getProjectName)
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     // Modify search to include project name as criteria
-    public List<Property> searchPropertiesByCriteria(double minPrice, double maxPrice, double minSize, double maxSize, String location, String projectName) {
+    public List<Property> searchPropertiesByCriteria(double minPrice, double maxPrice, double minSize, double maxSize,
+            String location, String projectName) {
         return properties.stream()
                 .filter(property -> property.getPrice() >= minPrice && property.getPrice() <= maxPrice)
                 .filter(property -> property.getSize() >= minSize && property.getSize() <= maxSize)

@@ -13,6 +13,7 @@ public class FileHandler {
     private static FileHandler instance;
     private final String propertiesCSVPath = "src/resources/properties.csv"; // Properties CSV file path
     private final String transactionsCSVPath = "src/resources/transactions.csv"; // Transactions CSV file path
+    private final String pendingPropertiesCSVPath = "src/resources/pending_properties.csv";  // New pending properties file
 
     public FileHandler() {
     }
@@ -79,7 +80,7 @@ public class FileHandler {
         }
     }
 
-    // Save properties to a file (for writing back to CSV)
+    // Save properties to file (for writing approved properties to CSV)
     public void savePropertiesToFile(List<Property> properties) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(propertiesCSVPath, false))) {
             for (Property property : properties) {
@@ -89,6 +90,17 @@ public class FileHandler {
             }
         } catch (IOException e) {
             logger.severe("Error saving properties: " + e.getMessage());
+        }
+    }
+
+    // Save pending property to file
+    public void savePendingPropertyToCSV(Property property) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(pendingPropertiesCSVPath, true))) {
+            bw.write(property.getSize() + "," + property.getPrice() + "," + property.getFacilities() + "," +
+                    property.getProjectName() + "," + property.getAddress());
+            bw.newLine();
+        } catch (IOException e) {
+            logger.severe("Error saving pending property: " + e.getMessage());
         }
     }
 
