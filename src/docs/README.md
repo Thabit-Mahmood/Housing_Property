@@ -102,7 +102,23 @@ Welcome to the **Housing Property Management System**, a comprehensive applicati
    - Make sure JavaFX modules are properly loaded.
 
 ---
+## Login Credentials
 
+The system includes three types of users: *Customer, **Seller, and **Admin*. Use the following login credentials to access their respective dashboards:
+
+- *Customer*:
+  - Username: customer
+  - Password: 12345678
+  
+- *Seller*:
+  - Username: seller
+  - Password: 12345678
+  
+- *Admin*:
+  - Username: admin
+  - Password: 12345678
+
+---
 ### Key Classes
 
 - **PropertyController.java**: Manages property search, submission, approval, and removal.
