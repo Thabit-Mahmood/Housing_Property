@@ -133,15 +133,20 @@ public class FileHandler {
                 if (data.length >= 11) {
                     try {
                         // Parse fields based on the provided CSV format
+                        @SuppressWarnings("unused")
                         String dateOfValuation = data[0].trim();
+                        @SuppressWarnings("unused")
                         double sizeSqM = tryParseDouble(data[1].trim(), "Size SqM");
                         double sizeSqFt = tryParseDouble(data[2].trim(), "Size SqFt");
                         String propertyType = data[3].trim();
+                        @SuppressWarnings("unused")
                         String noOfFloors = data[4].trim();
                         String address = data[5].trim();
                         String projectName = data[6].trim();
                         double price = tryParseDouble(data[7].trim(), "Price");
+                        @SuppressWarnings("unused")
                         String year = data[8].trim(); // Not used directly
+                        @SuppressWarnings("unused")
                         String pricePerSqFt = data[9].trim(); // Not used directly
                         String sellerUsername = data.length == 11 ? data[10].trim() : ""; // Ensure the seller is
                                                                                           // present
