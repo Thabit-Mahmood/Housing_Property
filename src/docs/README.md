@@ -1,5 +1,15 @@
 # Housing Property Management System
 
+## Team Members
+--------------------------------------------------------------------------------------------------
+| Name                         | Student ID |              Email            | Lecture | Tutorial |
+|------------------------------|------------|-------------------------------|---------|----------|
+| SALMA IBRAHIM MOHMED         | 1221302021 | 1221302021@student.mmu.edu.my |  TC1L   |   TT1L   |
+| ABDULKAFI WALEED             | 1201102665 | 1201102665@student.mmu.edu.my |  TC1L   |   TT1L   |
+| BOUKHARI, ABD ERRAHMANE      | 1221301202 | 1221301202@student.mmu.edu.my |  TC1L   |   TT1L   |
+--------------------------------------------------------------------------------------------------
+
+
 ## Introduction
 
 Welcome to the **Housing Property Management System**, a comprehensive application designed to manage properties, transactions, and projects. Users can search for properties based on criteria like size, price, and facilities, view detailed information, and execute property transactions seamlessly. Sellers can submit properties for approval, and admins can manage property listings efficiently.
@@ -50,19 +60,15 @@ Welcome to the **Housing Property Management System**, a comprehensive applicati
 
 ### Running the Project on **Visual Studio Code**:
 
-1. **Clone the Repository**:
-   ```
-   git clone <repository-url>
-   ```
 
-2. **Open the Project in VSCode**:
+1. **Open the Project in VSCode**:
    - Open VSCode and select `File > Open Folder` and navigate to the cloned repository.
 
-3. **Set Up Extensions**:
+2. **Set Up Extensions**:
    - Install the "Java Extension Pack" if not already installed.
    - Ensure the project structure is recognized by VSCode.
 
-4. **Configure JavaFX**:
+3. **Configure JavaFX**:
    - Go to `settings.json` and add the following configuration:
      ```json
      "java.project.referencedLibraries": [
@@ -74,7 +80,7 @@ Welcome to the **Housing Property Management System**, a comprehensive applicati
      }
      ```
 
-5. **Run the Project**:
+4. **Run the Project**:
    - Right-click on `MainView.java` and select `Run Java`.
    - Alternatively, run the project by navigating to `Run > Run Without Debugging`.
 
@@ -143,8 +149,6 @@ Welcome to the **Housing Property Management System**, a comprehensive applicati
 
 ---
 
-## Contact Information
 
-For support, issues, or feature requests, please contact:
-- Email: [support@propertysystem.com](mailto:support@propertysystem.com)
-- Phone: +1-800-123-4567
+
+
