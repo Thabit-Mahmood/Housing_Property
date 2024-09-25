@@ -7,6 +7,10 @@ import javafx.stage.Stage;
 import controller.AdminController;
 import controller.TransactionController;
 import model.Property;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
+
 
 public class AdminDashboardView {
 
@@ -19,6 +23,7 @@ public class AdminDashboardView {
         this.transactionController = transactionController;
     }
 
+    @SuppressWarnings("unchecked")
     public void displayAdminDashboard(Stage primaryStage) {
         primaryStage.setTitle("Admin Dashboard");
 
@@ -64,43 +69,58 @@ public class AdminDashboardView {
         Label propertyApprovalLabel = new Label("Property Approval");
         Button approvePropertyButton = new Button("Approve Property");
         Button rejectPropertyButton = new Button("Reject Property");
-        Label nextPendingPropertyLabel = new Label("Next Pending Property: None");
 
-        updateNextPendingPropertyLabel(nextPendingPropertyLabel);
+// Create a TableView for the next pending property details
+        TableView<Property> propertyTableView = new TableView<>();
+// Set a fixed cell height (e.g., 40 pixels)
+        propertyTableView.setFixedCellSize(40);
+        propertyTableView.setPrefHeight(1500); // You can adjust the preferred height as needed
 
-        // Approve the next pending property
-        // Approve the next pending property
+// Define columns
+        TableColumn<Property, String> addressColumn = new TableColumn<>("Address");
+        addressColumn.setCellValueFactory(new PropertyValueFactory<>("address"));
+
+        TableColumn<Property, Double> sizeColumn = new TableColumn<>("Size (SqFt)");
+        sizeColumn.setCellValueFactory(new PropertyValueFactory<>("size"));
+
+        TableColumn<Property, Double> priceColumn = new TableColumn<>("Price");
+        priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
+
+        TableColumn<Property, String> facilitiesColumn = new TableColumn<>("Facilities");
+        facilitiesColumn.setCellValueFactory(new PropertyValueFactory<>("facilities"));
+
+        TableColumn<Property, String> sellerColumn = new TableColumn<>("Seller");
+        sellerColumn.setCellValueFactory(new PropertyValueFactory<>("sellerUsername"));
+
+// Add columns to the table
+        propertyTableView.getColumns().addAll(addressColumn, sizeColumn, priceColumn, facilitiesColumn, sellerColumn);
+
+// Update the table with the next pending property
+        updatePropertyTableView(propertyTableView);
+
+// Approve the next pending property
         approvePropertyButton.setOnAction(e -> {
             Property nextPendingProperty = adminController.approveNextProperty();
             if (nextPendingProperty != null) {
-                // Create a formatted message showing property details
-                String propertyDetails = String.format("Approved Property: %s\nSize: %.2f SqFt\nPrice: %.2f\nFacilities: %s\nSeller: %s",
-                        nextPendingProperty.getAddress(),
-                        nextPendingProperty.getSize(),
-                        nextPendingProperty.getPrice(),
-                        nextPendingProperty.getFacilities(),
-                        nextPendingProperty.getSellerUsername());
-
-                showSuccess(propertyDetails);
-                updateNextPendingPropertyLabel(nextPendingPropertyLabel); // Refresh pending property
+                showSuccess("Approved Property: " + nextPendingProperty.getAddress());
+                updatePropertyTableView(propertyTableView); // Refresh pending property
             } else {
                 showError("No pending properties to approve.");
             }
         });
 
-
-        // Reject the next pending property
+// Reject the next pending property
         rejectPropertyButton.setOnAction(e -> {
             Property nextPendingProperty = adminController.rejectNextProperty();
             if (nextPendingProperty != null) {
                 showSuccess("Rejected Property: " + nextPendingProperty.getAddress());
-                updateNextPendingPropertyLabel(nextPendingPropertyLabel); // Refresh pending property
+                updatePropertyTableView(propertyTableView); // Refresh pending property
             } else {
                 showError("No pending properties to reject.");
             }
         });
 
-        VBox propertyApprovalLayout = new VBox(10, propertyApprovalLabel, nextPendingPropertyLabel, approvePropertyButton, rejectPropertyButton);
+        VBox propertyApprovalLayout = new VBox(10, propertyApprovalLabel, propertyTableView, approvePropertyButton, rejectPropertyButton);
 
         VBox layout = new VBox(20);
         layout.getChildren().addAll(new Label("Welcome to the Admin Dashboard"), projectManagementLabel, projectNameInput, createProjectButton, deleteProjectInput, deleteProjectButton, listProjectsButton, projectListView, propertyApprovalLayout);
@@ -112,20 +132,16 @@ public class AdminDashboardView {
 
     // Update the label to show the next pending property
     // Update the label to show the next pending property
-    private void updateNextPendingPropertyLabel(Label label) {
+    // Update the TableView with the next pending property
+    private void updatePropertyTableView(TableView<Property> tableView) {
+        tableView.getItems().clear(); // Clear existing items
         Property nextPendingProperty = adminController.getPendingProperty();
         if (nextPendingProperty != null) {
-            String propertyDetails = String.format("Next Pending Property: %s\nSize: %.2f SqFt\nPrice: %.2f\nFacilities: %s\nSeller: %s",
-                    nextPendingProperty.getAddress(),
-                    nextPendingProperty.getSize(),
-                    nextPendingProperty.getPrice(),
-                    nextPendingProperty.getFacilities(),
-                    nextPendingProperty.getSellerUsername());
-            label.setText(propertyDetails);
-        } else {
-            label.setText("Next Pending Property: None");
+            tableView.getItems().add(nextPendingProperty); // Add the next pending property to the table
         }
     }
+
+
 
 
     // Show error message

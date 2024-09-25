@@ -23,8 +23,6 @@ public class PropertyController {
         this.approvalService = PropertyApprovalService.getInstance();
         this.properties = fileHandler.loadPropertiesFromCSV(); // Load approved properties from CSV
 
-        // Load properties from CSV
-        this.properties = fileHandler.loadPropertiesFromCSV();
         System.out.println("Properties loaded: " + properties.size());
 
         // Log loaded properties for debugging purposes
@@ -68,8 +66,30 @@ public class PropertyController {
     // Method for submitting a property for approval by a seller
     public void submitPropertyForApproval(Seller seller, Property property) {
         property.setSellerUsername(seller.getUsername()); // Associate property with the seller
-        approvalService.submitForApproval(property); // Submit property for admin approval
-        fileHandler.savePendingPropertyToCSV(property); // Save to pending properties CSV file
+
+        // Check if the property is already in pending properties
+        if (!isPropertyInPendingCSV(property)) {
+            approvalService.submitForApproval(property); // Submit property for admin approval
+            fileHandler.savePendingPropertyToCSV(property); // Save to pending properties CSV file
+            System.out.println("Property submitted for approval: " + property.getAddress());
+        } else {
+            System.out.println("Property is already pending: " + property.getAddress());
+        }
+    }
+
+    // Check if property is already in pending_properties.csv
+    private boolean isPropertyInPendingCSV(Property property) {
+        List<Property> pendingProperties = approvalService.getPendingProperties();
+        for (Property pendingProperty : pendingProperties) {
+            // Compare all relevant fields
+            if (pendingProperty.getAddress().equals(property.getAddress()) &&
+                    pendingProperty.getProjectName().equals(property.getProjectName()) &&
+                    pendingProperty.getPrice() == property.getPrice() &&
+                    pendingProperty.getFacilities().equals(property.getFacilities())) {
+                return true; // Duplicate found
+            }
+        }
+        return false; // No duplicates
     }
 
     // Method to get the list of pending properties

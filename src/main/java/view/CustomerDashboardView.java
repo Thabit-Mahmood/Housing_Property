@@ -13,6 +13,7 @@ import controller.PropertyController;
 import controller.TransactionController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CustomerDashboardView {
 
@@ -86,27 +87,28 @@ public class CustomerDashboardView {
             try {
                 // Validate and parse input fields
                 double minPrice = minPriceInput.getText().isEmpty() ? 0 : Double.parseDouble(minPriceInput.getText());
-                double maxPrice = maxPriceInput.getText().isEmpty() ? Double.MAX_VALUE
-                        : Double.parseDouble(maxPriceInput.getText());
+                double maxPrice = maxPriceInput.getText().isEmpty() ? Double.MAX_VALUE : Double.parseDouble(maxPriceInput.getText());
                 double minSize = minSizeInput.getText().isEmpty() ? 0 : Double.parseDouble(minSizeInput.getText());
-                double maxSize = maxSizeInput.getText().isEmpty() ? Double.MAX_VALUE
-                        : Double.parseDouble(maxSizeInput.getText());
+                double maxSize = maxSizeInput.getText().isEmpty() ? Double.MAX_VALUE : Double.parseDouble(maxSizeInput.getText());
                 String location = locationInput.getText();
                 String facilities = facilitiesInput.getText();
                 String selectedProjectName = projectNameDropdown.getSelectionModel().getSelectedItem();
 
                 // Fetch properties based on the criteria
-                List<Property> results = propertyController.searchPropertiesByCriteria(minPrice, maxPrice, minSize,
-                        maxSize, location, selectedProjectName, facilities);
+                List<Property> results = propertyController.searchPropertiesByCriteria(minPrice, maxPrice, minSize, maxSize, location, selectedProjectName, facilities);
 
+                // Clear the table before adding new search results
                 propertyTableView.getItems().clear();
-                propertyTableView.getItems().addAll(results);
+
+                // Add unique properties to avoid duplicates
+                propertyTableView.getItems().addAll(results.stream().distinct().collect(Collectors.toList()));
 
             } catch (NumberFormatException ex) {
                 // Handle invalid input
                 showError("Please enter valid numeric values for price and size.");
             }
         });
+
 
         // Buy Property button
         Button buyPropertyButton = new Button("Buy Property");

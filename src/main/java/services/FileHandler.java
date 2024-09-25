@@ -175,9 +175,8 @@ public class FileHandler {
         } catch (IOException e) {
             logger.severe("Error saving properties: " + e.getMessage());
         }
-    }    
+    }
 
-    // Save pending property to file with seller association
     public void savePendingPropertyToCSV(Property property) {
         // First, load existing pending properties to check for duplicates
         List<Property> existingProperties = loadPendingPropertiesFromCSV();
@@ -186,7 +185,8 @@ public class FileHandler {
         boolean isDuplicate = existingProperties.stream()
                 .anyMatch(p -> p.getAddress().equals(property.getAddress())
                         && p.getProjectName().equals(property.getProjectName())
-                        && p.getPrice() == property.getPrice());
+                        && p.getPrice() == property.getPrice()
+                        && p.getSize() == property.getSize()); // Added size check
 
         // If it's a duplicate, do not save it
         if (isDuplicate) {
@@ -204,6 +204,7 @@ public class FileHandler {
         }
     }
 
+
     // Load properties from the pending properties CSV file
     public List<Property> loadPendingPropertiesFromCSV() {
         List<Property> properties = new ArrayList<>();
@@ -216,8 +217,9 @@ public class FileHandler {
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
-            // Skip the header in pending properties CSV
-            // br.readLine();
+            // Skip the header if exists; add this only if you have a header in your pending properties CSV
+            // br.readLine(); // Uncomment if there's a header
+
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(","); // Adjust if you handle quoted data
 
