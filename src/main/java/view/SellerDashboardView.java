@@ -21,6 +21,7 @@ public class SellerDashboardView {
   private PropertyController propertyController;
   private Seller seller;
   private ProjectService projectService; // Service to get existing projects
+  @SuppressWarnings("unused")
   private ObservableList<String> projectNames; // Dropdown for existing projects
   private ComboBox<String> projectNameDropdown;
   private TextField addressField;
@@ -120,6 +121,7 @@ public class SellerDashboardView {
   }
 
   // Show error message
+  @SuppressWarnings("unused")
   private void showError(String errorMessage) {
     Alert alert = new Alert(Alert.AlertType.ERROR);
     alert.setTitle("Error");
