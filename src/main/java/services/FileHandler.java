@@ -26,42 +26,68 @@ public class FileHandler {
         return instance;
     }
 
+    // Modify this method in FileHandler.java to properly load projects from CSV
+    public List<String> loadProjectsFromCSV() {
+        List<String> projectNames = new ArrayList<>();
+        File file = new File("src/resources/projects.csv"); // Ensure the correct path to your projects file
+
+        if (!file.exists()) {
+            logger.severe("Projects CSV file does not exist.");
+            return projectNames;
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+
+            // Read all project names from CSV
+            while ((line = br.readLine()) != null) {
+                String projectName = line.trim();
+                if (!projectName.isEmpty()) {
+                    projectNames.add(projectName); // Add the project name to the list
+                }
+            }
+        } catch (IOException e) {
+            logger.severe("Error reading projects CSV file: " + e.getMessage());
+        }
+
+        return projectNames;
+    }
+
+    // Modify this method in ProjectService.java to use FileHandler
+    public List<String> getAllProjectNames() {
+        return FileHandler.getInstance().loadProjectsFromCSV(); // Fetch project names from the CSV file using
+                                                                // FileHandler
+    }
+
     // Read transactions from the CSV file
     public List<Transaction> loadTransactionsFromCSV() {
         List<Transaction> transactions = new ArrayList<>();
         File file = new File(transactionsCSVPath);
 
-        // Check if the file exists; if not, log error
         if (!file.exists()) {
             logger.severe("CSV file does not exist at " + transactionsCSVPath);
             return transactions;
         }
 
-        // Read transactions from the CSV file
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
-
-            // Skip the header line
-            br.readLine(); // Skip first line which is the header
+            br.readLine(); // Skip header
 
             while ((line = br.readLine()) != null) {
-                // Split by commas, handling quoted strings properly
-                String[] data = parseCSVLine(line);
-                if (data.length == 4) { // Ensure it has the expected number of fields
+                String[] data = line.split(",");
+                if (data.length == 4) { // Ensure valid format
                     String projectName = data[0].trim();
                     String address = data[1].trim();
                     String size = data[2].trim();
                     double price = Double.parseDouble(data[3].trim());
 
                     transactions.add(new Transaction(projectName, address, size, price));
-                    System.out.println("Loaded transaction for project: " + projectName + ", Address: " + address);
                 }
             }
         } catch (IOException e) {
             logger.severe("Error reading transactions CSV file: " + e.getMessage());
         }
 
-        System.out.println("Total transactions loaded: " + transactions.size());
         return transactions;
     }
 

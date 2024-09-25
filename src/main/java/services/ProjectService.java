@@ -188,7 +188,7 @@ public class ProjectService {
         for (Project project : projects) {
             projectNames.add(project.getProjectName());
         }
-        return projectNames;
+        return FileHandler.getInstance().loadProjectsFromCSV();
     }
 
     // Get a project by name

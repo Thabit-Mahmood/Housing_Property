@@ -9,6 +9,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Property;
 import model.Transaction;
+import services.ProjectService;
 import controller.PropertyController;
 import controller.TransactionController;
 
@@ -23,7 +24,7 @@ public class CustomerDashboardView {
     public CustomerDashboardView(PropertyController propertyController) {
         this.propertyController = propertyController;
         this.transactionController = new TransactionController(new TransactionView());
-        this.projectNames = FXCollections.observableArrayList(propertyController.getAllProjectNames()); // Load project names for dropdown
+        this.projectNames = FXCollections.observableArrayList(ProjectService.getInstance().getAllProjectNames()); // Load project names
     }
 
     // Display the customer dashboard
@@ -45,7 +46,7 @@ public class CustomerDashboardView {
         maxSizeInput.setPromptText("Max Size (SqFt)");
 
         // Project name dropdown/auto-suggestion
-        ComboBox<String> projectNameDropdown = new ComboBox<>(projectNames);
+        ComboBox<String> projectNameDropdown = new ComboBox<>(projectNames); // Load project names into dropdown
         projectNameDropdown.setPromptText("Project Name");
 
         TextField locationInput = new TextField();
@@ -102,41 +103,39 @@ public class CustomerDashboardView {
             }
         });
 
-        // Button to view transaction history
+        // View transaction history button
         Button viewTransactionHistoryButton = new Button("View Transaction History");
-
-        // Transaction history view (ListView)
         ListView<String> transactionListView = new ListView<>();
 
-        // View transaction history button action
         viewTransactionHistoryButton.setOnAction(e -> {
             Property selectedProperty = propertyTableView.getSelectionModel().getSelectedItem();
             if (selectedProperty != null) {
                 String projectName = selectedProperty.getProjectName();
-                List<Transaction> transactions = transactionController.fetchRecentTransactions(projectName, 5); // Fetch the last 5 transactions
+                List<Transaction> transactions = transactionController.fetchRecentTransactions(projectName, 5);
                 transactionListView.getItems().clear();
-                transactions.forEach(transaction -> transactionListView.getItems().add(transaction.toString())); // Display the transactions
+                if (transactions != null) {
+                    for (Transaction transaction : transactions) {
+                        transactionListView.getItems().add(transaction.toString());
+                    }
+                } else {
+                    transactionListView.getItems().add("No transactions found.");
+                }
             } else {
-                transactionListView.getItems().clear();
-                transactionListView.getItems().add("No property selected.");
+                showError("Please select a property to view its transaction history.");
             }
         });
 
         VBox layout = new VBox(10);
-        layout.getChildren().addAll(
-                new Label("Search Properties"),
-                minPriceInput, maxPriceInput, minSizeInput, maxSizeInput, locationInput, facilitiesInput, projectNameDropdown,
-                searchButton, propertyTableView, viewTransactionHistoryButton, transactionListView);
+        layout.getChildren().addAll(minPriceInput, maxPriceInput, minSizeInput, maxSizeInput, projectNameDropdown, searchButton, propertyTableView, viewTransactionHistoryButton, transactionListView);
 
         Scene scene = new Scene(layout, 800, 600);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    // Show error message
     private void showError(String errorMessage) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Input Error");
+        alert.setTitle("Error");
         alert.setHeaderText(null);
         alert.setContentText(errorMessage);
         alert.showAndWait();
