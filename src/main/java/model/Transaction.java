@@ -13,7 +13,6 @@ public class Transaction {
         this.price = price;
     }
 
-    // Getters and setters
     public String getProjectName() {
         return projectName;
     }
@@ -30,12 +29,11 @@ public class Transaction {
         return price;
     }
 
-    // Properly formatted toString() method
     @Override
     public String toString() {
-        return "Transaction [Project: " + projectName +
+        return "Project: " + projectName +
                ", Address: " + address +
                ", Size: " + size + " sq ft" +
-               ", Price: $" + String.format("%,.2f", price) + "]";
+               ", Price: $" + String.format("%,.2f", price);
     }
 }

@@ -19,8 +19,8 @@ public class TransactionController {
         this.fileHandler = FileHandler.getInstance(); // Initialize the FileHandler
     }
 
-       // Fetch transactions for a specific project from the file
-       public List<Transaction> fetchTransactions(String projectName) {
+    // Fetch transactions for a specific project from the file
+    public List<Transaction> fetchTransactions(String projectName) {
         List<Transaction> allTransactions = fileHandler.loadTransactionsFromCSV();
         List<Transaction> projectTransactions = allTransactions.stream()
                 .filter(transaction -> transaction.getProjectName().trim().equalsIgnoreCase(projectName.trim()))
@@ -36,12 +36,20 @@ public class TransactionController {
     // Fetch the last N transactions for a specific project (new feature)
     public List<Transaction> fetchRecentTransactions(String projectName, int limit) {
         List<Transaction> allTransactions = fileHandler.loadTransactionsFromCSV();
+
+        // Debugging: Check if transactions are being loaded
+        System.out.println("Loaded " + allTransactions.size() + " transactions from CSV.");
+
         List<Transaction> projectTransactions = allTransactions.stream()
                 .filter(transaction -> transaction.getProjectName().trim().equalsIgnoreCase(projectName.trim()))
                 .collect(Collectors.toList());
 
+        // Debugging: Check if the transactions are filtered properly
         System.out.println("Found " + projectTransactions.size() + " transactions for project: " + projectName);
+
+        // Return the last 'limit' number of transactions
         int transactionCount = projectTransactions.size();
         return projectTransactions.subList(Math.max(transactionCount - limit, 0), transactionCount);
     }
+
 }

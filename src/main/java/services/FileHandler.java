@@ -74,7 +74,7 @@ public class FileHandler {
             br.readLine(); // Skip header
 
             while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
+                String[] data = parseCSVLine(line); // Properly handle quoted CSV lines
                 if (data.length == 4) { // Ensure valid format
                     String projectName = data[0].trim();
                     String address = data[1].trim();
@@ -88,6 +88,7 @@ public class FileHandler {
             logger.severe("Error reading transactions CSV file: " + e.getMessage());
         }
 
+        System.out.println("Total transactions loaded: " + transactions.size()); // Debugging
         return transactions;
     }
 

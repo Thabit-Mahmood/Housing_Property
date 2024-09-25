@@ -116,14 +116,17 @@ public class CustomerDashboardView {
             Property selectedProperty = propertyTableView.getSelectionModel().getSelectedItem();
             if (selectedProperty != null) {
                 String projectName = selectedProperty.getProjectName();
+                System.out.println("Fetching transactions for project: " + projectName); // Debugging
+
                 List<Transaction> transactions = transactionController.fetchRecentTransactions(projectName, 5);
                 transactionListView.getItems().clear();
-                if (transactions != null) {
+                if (!transactions.isEmpty()) {
                     for (Transaction transaction : transactions) {
                         transactionListView.getItems().add(transaction.toString());
                     }
                 } else {
-                    transactionListView.getItems().add("No transactions found.");
+                    System.out.println("No transactions found for project: " + projectName); // Debugging
+                    transactionListView.getItems().add("No transactions found for the selected project.");
                 }
             } else {
                 showError("Please select a property to view its transaction history.");
