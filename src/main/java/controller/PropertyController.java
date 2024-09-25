@@ -22,7 +22,11 @@ public class PropertyController {
         this.fileHandler = FileHandler.getInstance();
         this.approvalService = PropertyApprovalService.getInstance();
 
-        // Log loaded properties
+        // Load properties from CSV
+        this.properties = fileHandler.loadPropertiesFromCSV();
+        System.out.println("Properties loaded: " + properties.size());
+
+        // Log loaded properties for debugging purposes
         System.out.println("Properties loaded: ");
         for (Property property : properties) {
             System.out.println(property.getAddress() + " - " + property.getPrice() + " - " + property.getSize());
@@ -93,27 +97,29 @@ public class PropertyController {
         fileHandler.savePropertiesToFile(allProperties); // Save approved properties
     }
 
-    // Method to filter properties based on criteria, now including facilities
+    // Method to filter properties based on criteria, including facilities
     public List<Property> searchPropertiesByCriteria(double minPrice, double maxPrice, double minSize, double maxSize,
-            String location, String projectName, String facilities) {
-        return properties.stream()
+                                                     String location, String projectName, String facilities) {
+        // Debugging the input criteria
+        System.out.println("Search Criteria - Min Price: " + minPrice + ", Max Price: " + maxPrice +
+                ", Min Size: " + minSize + ", Max Size: " + maxSize +
+                ", Location: " + location + ", Project Name: " + projectName + ", Facilities: " + facilities);
+
+        // Filter properties based on input criteria
+        List<Property> filteredProperties = properties.stream()
                 .filter(property -> property.getPrice() >= minPrice && property.getPrice() <= maxPrice)
                 .filter(property -> property.getSize() >= minSize && property.getSize() <= maxSize)
-                .filter(property -> location.isEmpty() || property.getAddress().contains(location))
-                .filter(property -> projectName == null || property.getProjectName().equalsIgnoreCase(projectName))
-                .filter(property -> facilities.isEmpty()
-                        || property.getFacilities().toLowerCase().contains(facilities.toLowerCase()))
+                .filter(property -> location.isEmpty() || property.getAddress().toLowerCase().contains(location.toLowerCase()))
+                .filter(property -> projectName == null || projectName.isEmpty() || property.getProjectName().equalsIgnoreCase(projectName))
+                .filter(property -> facilities.isEmpty() || property.getFacilities().toLowerCase().contains(facilities.toLowerCase()))  // Facilities filtering
                 .collect(Collectors.toList());
-    }
 
-    // Method to search properties by project name
-    public List<Property> searchProperties(String projectName) {
-        List<Property> results = new ArrayList<>();
-        Project project = getProjectByName(projectName);
-        if (project != null) {
-            results.addAll(project.getProperties());
+        System.out.println("Filtered Properties: " + filteredProperties.size());
+        for (Property property : filteredProperties) {
+            System.out.println(property.getAddress() + " - " + property.getPrice() + " - " + property.getSize());
         }
-        return results;
+
+        return filteredProperties;
     }
 
     // Method to get a project by name

@@ -6,10 +6,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Box;
 import javafx.stage.Stage;
 import model.Property;
 import model.Transaction;
-import services.ProjectService;
 import controller.PropertyController;
 import controller.TransactionController;
 
@@ -24,11 +24,12 @@ public class CustomerDashboardView {
     public CustomerDashboardView(PropertyController propertyController) {
         this.propertyController = propertyController;
         this.transactionController = new TransactionController(new TransactionView());
-        this.projectNames = FXCollections.observableArrayList(ProjectService.getInstance().getAllProjectNames()); // Load project names
+        this.projectNames = FXCollections.observableArrayList(propertyController.getAllProjectNames()); // Load project
+                                                                                                        // names for
+                                                                                                        // dropdown
     }
 
     // Display the customer dashboard
-    @SuppressWarnings("unchecked")
     public void displayCustomerDashboard(Stage primaryStage) {
         primaryStage.setTitle("Customer Dashboard");
 
@@ -46,7 +47,7 @@ public class CustomerDashboardView {
         maxSizeInput.setPromptText("Max Size (SqFt)");
 
         // Project name dropdown/auto-suggestion
-        ComboBox<String> projectNameDropdown = new ComboBox<>(projectNames); // Load project names into dropdown
+        ComboBox<String> projectNameDropdown = new ComboBox<>(projectNames);
         projectNameDropdown.setPromptText("Project Name");
 
         TextField locationInput = new TextField();
@@ -77,22 +78,26 @@ public class CustomerDashboardView {
         facilitiesColumn.setCellValueFactory(new PropertyValueFactory<>("facilities"));
 
         // Add columns to TableView
-        propertyTableView.getColumns().addAll(addressColumn, sizeColumn, priceColumn, projectNameColumn, facilitiesColumn);
+        propertyTableView.getColumns().addAll(addressColumn, sizeColumn, priceColumn, projectNameColumn,
+                facilitiesColumn);
 
         // Search button action
         searchButton.setOnAction(e -> {
             try {
                 // Validate and parse input fields
                 double minPrice = minPriceInput.getText().isEmpty() ? 0 : Double.parseDouble(minPriceInput.getText());
-                double maxPrice = maxPriceInput.getText().isEmpty() ? Double.MAX_VALUE : Double.parseDouble(maxPriceInput.getText());
+                double maxPrice = maxPriceInput.getText().isEmpty() ? Double.MAX_VALUE
+                        : Double.parseDouble(maxPriceInput.getText());
                 double minSize = minSizeInput.getText().isEmpty() ? 0 : Double.parseDouble(minSizeInput.getText());
-                double maxSize = maxSizeInput.getText().isEmpty() ? Double.MAX_VALUE : Double.parseDouble(maxSizeInput.getText());
+                double maxSize = maxSizeInput.getText().isEmpty() ? Double.MAX_VALUE
+                        : Double.parseDouble(maxSizeInput.getText());
                 String location = locationInput.getText();
                 String facilities = facilitiesInput.getText();
                 String selectedProjectName = projectNameDropdown.getSelectionModel().getSelectedItem();
 
                 // Fetch properties based on the criteria
-                List<Property> results = propertyController.searchPropertiesByCriteria(minPrice, maxPrice, minSize, maxSize, location, selectedProjectName, facilities);
+                List<Property> results = propertyController.searchPropertiesByCriteria(minPrice, maxPrice, minSize,
+                        maxSize, location, selectedProjectName, facilities);
 
                 propertyTableView.getItems().clear();
                 propertyTableView.getItems().addAll(results);
@@ -126,7 +131,9 @@ public class CustomerDashboardView {
         });
 
         VBox layout = new VBox(10);
-        layout.getChildren().addAll(minPriceInput, maxPriceInput, minSizeInput, maxSizeInput, projectNameDropdown, searchButton, propertyTableView, viewTransactionHistoryButton, transactionListView);
+        layout.getChildren().addAll(minPriceInput, maxPriceInput, minSizeInput, maxSizeInput, projectNameDropdown,
+                locationInput, facilitiesInput, searchButton, propertyTableView, viewTransactionHistoryButton,
+                transactionListView);
 
         Scene scene = new Scene(layout, 800, 600);
         primaryStage.setScene(scene);
