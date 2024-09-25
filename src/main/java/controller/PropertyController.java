@@ -20,7 +20,6 @@ public class PropertyController {
         this.properties = new ArrayList<>();
         this.projects = new ArrayList<>();
         this.fileHandler = FileHandler.getInstance();
-        initializePropertiesFromCSV();  // Now using CSV method
         this.approvalService = PropertyApprovalService.getInstance();
 
         // Log loaded properties
@@ -61,13 +60,15 @@ public class PropertyController {
 
     // Get all properties owned by a specific seller
     public List<Property> getSellerProperties(Seller seller) {
-        this.properties = fileHandler.loadPropertiesFromCSV();  // Reload approved properties from CSV
+        // Load the approved properties from the CSV file
+        this.properties = fileHandler.loadPropertiesFromCSV();  // Load approved properties from CSV
         return properties.stream()
                 .filter(property -> property.getSellerUsername().equals(seller.getUsername()))
                 .collect(Collectors.toList());
     }
 
     // Initialize properties from CSV
+    @SuppressWarnings("unused")
     private void initializePropertiesFromCSV() {
         this.properties = fileHandler.loadPropertiesFromCSV();  // Load approved properties from CSV
         for (Property property : properties) {

@@ -13,7 +13,8 @@ public class FileHandler {
     private static FileHandler instance;
     private final String propertiesCSVPath = "src/resources/properties.csv"; // Properties CSV file path
     private final String transactionsCSVPath = "src/resources/transactions.csv"; // Transactions CSV file path
-    private final String pendingPropertiesCSVPath = "src/resources/pending_properties.csv";  // New pending properties file
+    private final String pendingPropertiesCSVPath = "src/resources/pending_properties.csv"; // New pending properties
+                                                                                            // file
 
     public FileHandler() {
     }
@@ -63,6 +64,7 @@ public class FileHandler {
         System.out.println("Total transactions loaded: " + transactions.size());
         return transactions;
     }
+
     // Save transactions to the CSV file
     public void saveTransactionsToCSV(List<Transaction> transactions) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(transactionsCSVPath, false))) {
@@ -80,9 +82,14 @@ public class FileHandler {
         }
     }
 
-    // Save properties to file (for writing approved properties to CSV)
+    // Save properties to the CSV file (for writing approved properties to CSV)
     public void savePropertiesToFile(List<Property> properties) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(propertiesCSVPath, false))) {
+            // Write header
+            bw.write(
+                    "DateOfValuation,SizeSqM,SizeSqFt,Facilities,NoOfFloors,Address,ProjectName,Price,Year,PricePerSqFt,SellerUsername");
+            bw.newLine();
+
             for (Property property : properties) {
                 bw.write(property.getSize() + "," + property.getPrice() + "," + property.getFacilities() + "," +
                         property.getProjectName() + "," + property.getAddress() + "," + property.getSellerUsername());
@@ -104,7 +111,7 @@ public class FileHandler {
         }
     }
 
-// Load properties from CSV file (approved properties)
+    // Load properties from CSV file (approved properties)
     public List<Property> loadPropertiesFromCSV() {
         List<Property> properties = new ArrayList<>();
         File file = new File(propertiesCSVPath);
@@ -116,44 +123,82 @@ public class FileHandler {
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data.length == 6) { // Adjusted to 6 fields to include sellerUsername
-                    double size = Double.parseDouble(data[0].trim());
-                    double price = Double.parseDouble(data[1].trim());
-                    String facilities = data[2].trim();
-                    String projectName = data[3].trim();
-                    String address = data[4].trim();
-                    @SuppressWarnings("unused")
-                    String sellerUsername = data[5].trim();  // Extract sellerUsername
 
-                    properties.add(new Property(size, price, facilities, projectName, address));
+            // Skip the header line
+            br.readLine();
+
+            while ((line = br.readLine()) != null) {
+                String[] data = parseCSVLine(line);
+
+                if (data.length >= 11) {
+                    try {
+                        // Parse fields based on the provided CSV format
+                        String dateOfValuation = data[0].trim();
+                        double sizeSqM = tryParseDouble(data[1].trim(), "Size SqM");
+                        double sizeSqFt = tryParseDouble(data[2].trim(), "Size SqFt");
+                        String propertyType = data[3].trim();
+                        String noOfFloors = data[4].trim();
+                        String address = data[5].trim();
+                        String projectName = data[6].trim();
+                        double price = tryParseDouble(data[7].trim(), "Price");
+                        String year = data[8].trim(); // Not used directly
+                        String pricePerSqFt = data[9].trim(); // Not used directly
+                        String sellerUsername = data.length == 11 ? data[10].trim() : ""; // Ensure the seller is
+                                                                                          // present
+
+                        // Create Property object with the parsed data
+                        Property property = new Property(sizeSqFt, price, propertyType, projectName, address);
+                        property.setSellerUsername(sellerUsername);
+                        properties.add(property);
+
+                    } catch (NumberFormatException e) {
+                        logger.warning(
+                                "Skipping malformed numeric field in line: " + line + ". Error: " + e.getMessage());
+                    }
+                } else {
+                    logger.warning("Skipping malformed line (incorrect number of fields): " + line);
                 }
             }
         } catch (IOException e) {
             logger.severe("Error reading properties CSV file: " + e.getMessage());
         }
+
         return properties;
     }
 
-    // Helper method to parse CSV lines, handling commas inside quotes
+    // Helper method to safely parse double values, with detailed logging
+    private double tryParseDouble(String value, String fieldName) {
+        try {
+            return Double.parseDouble(value);
+        } catch (NumberFormatException e) {
+            logger.severe("Error parsing field '" + fieldName + "': " + value);
+            throw e; // Re-throw the exception after logging the issue
+        }
+    }
+
+    // Parse CSV line while handling commas inside quotes properly
     private String[] parseCSVLine(String line) {
         List<String> tokens = new ArrayList<>();
-        boolean inQuotes = false;
-        StringBuilder sb = new StringBuilder();
+        StringBuilder currentToken = new StringBuilder();
+        boolean insideQuote = false;
 
         for (char c : line.toCharArray()) {
             if (c == '"') {
-                inQuotes = !inQuotes; // Toggle state when encountering quotes
-            } else if (c == ',' && !inQuotes) {
-                tokens.add(sb.toString().trim()); // Add the token if we're not inside quotes
-                sb.setLength(0); // Clear the StringBuilder
+                insideQuote = !insideQuote; // Toggle the insideQuote flag
+            } else if (c == ',' && !insideQuote) {
+                // If we're not inside quotes, add the current token to the list
+                tokens.add(currentToken.toString().trim());
+                currentToken.setLength(0); // Clear the current token
             } else {
-                sb.append(c); // Add character to the token
+                // Otherwise, just append the character to the current token
+                currentToken.append(c);
             }
         }
 
-        tokens.add(sb.toString().trim()); // Add the last token
-        return tokens.toArray(new String[0]); // Convert to array
+        // Add the last token
+        tokens.add(currentToken.toString().trim());
+
+        return tokens.toArray(new String[0]);
     }
+
 }
