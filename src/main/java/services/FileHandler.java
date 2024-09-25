@@ -179,6 +179,22 @@ public class FileHandler {
 
     // Save pending property to file with seller association
     public void savePendingPropertyToCSV(Property property) {
+        // First, load existing pending properties to check for duplicates
+        List<Property> existingProperties = loadPendingPropertiesFromCSV();
+
+        // Check for duplicates
+        boolean isDuplicate = existingProperties.stream()
+                .anyMatch(p -> p.getAddress().equals(property.getAddress())
+                        && p.getProjectName().equals(property.getProjectName())
+                        && p.getPrice() == property.getPrice());
+
+        // If it's a duplicate, do not save it
+        if (isDuplicate) {
+            logger.warning("Duplicate property not saved: " + property.getAddress());
+            return; // Exit the method if the property is a duplicate
+        }
+
+        // Proceed to save the new property if it's not a duplicate
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(pendingPropertiesCSVPath, true))) {
             bw.write(property.getSize() + "," + property.getPrice() + "," + property.getFacilities() + "," +
                     property.getProjectName() + "," + property.getAddress() + "," + property.getSellerUsername());
@@ -188,6 +204,38 @@ public class FileHandler {
         }
     }
 
+    // Load properties from the pending properties CSV file
+    public List<Property> loadPendingPropertiesFromCSV() {
+        List<Property> properties = new ArrayList<>();
+        File file = new File(pendingPropertiesCSVPath);
+
+        if (!file.exists()) {
+            logger.severe("Pending properties CSV file does not exist.");
+            return properties;
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            // Skip the header in pending properties CSV
+            // br.readLine();
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(","); // Adjust if you handle quoted data
+
+                if (data.length >= 6) { // Ensure we have enough fields to create a Property object
+                    String address = data[4].trim(); // Assuming address is the 5th field
+                    String projectName = data[3].trim(); // Assuming project name is the 4th field
+                    double price = Double.parseDouble(data[1].trim()); // Assuming price is the 2nd field
+                    // Create a new Property object and add it to the list
+                    Property property = new Property(Double.parseDouble(data[2].trim()), price, data[5].trim(), projectName, address);
+                    properties.add(property);
+                }
+            }
+        } catch (IOException e) {
+            logger.severe("Error reading pending properties CSV file: " + e.getMessage());
+        }
+
+        return properties;
+    }
     // Load properties from CSV file (approved properties)
     public List<Property> loadPropertiesFromCSV() {
         List<Property> properties = new ArrayList<>();

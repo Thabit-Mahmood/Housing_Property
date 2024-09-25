@@ -69,15 +69,25 @@ public class AdminDashboardView {
         updateNextPendingPropertyLabel(nextPendingPropertyLabel);
 
         // Approve the next pending property
+        // Approve the next pending property
         approvePropertyButton.setOnAction(e -> {
             Property nextPendingProperty = adminController.approveNextProperty();
             if (nextPendingProperty != null) {
-                showSuccess("Approved Property: " + nextPendingProperty.getAddress());
+                // Create a formatted message showing property details
+                String propertyDetails = String.format("Approved Property: %s\nSize: %.2f SqFt\nPrice: %.2f\nFacilities: %s\nSeller: %s",
+                        nextPendingProperty.getAddress(),
+                        nextPendingProperty.getSize(),
+                        nextPendingProperty.getPrice(),
+                        nextPendingProperty.getFacilities(),
+                        nextPendingProperty.getSellerUsername());
+
+                showSuccess(propertyDetails);
                 updateNextPendingPropertyLabel(nextPendingPropertyLabel); // Refresh pending property
             } else {
                 showError("No pending properties to approve.");
             }
         });
+
 
         // Reject the next pending property
         rejectPropertyButton.setOnAction(e -> {
@@ -101,14 +111,22 @@ public class AdminDashboardView {
     }
 
     // Update the label to show the next pending property
+    // Update the label to show the next pending property
     private void updateNextPendingPropertyLabel(Label label) {
         Property nextPendingProperty = adminController.getPendingProperty();
         if (nextPendingProperty != null) {
-            label.setText("Next Pending Property: " + nextPendingProperty.getAddress());
+            String propertyDetails = String.format("Next Pending Property: %s\nSize: %.2f SqFt\nPrice: %.2f\nFacilities: %s\nSeller: %s",
+                    nextPendingProperty.getAddress(),
+                    nextPendingProperty.getSize(),
+                    nextPendingProperty.getPrice(),
+                    nextPendingProperty.getFacilities(),
+                    nextPendingProperty.getSellerUsername());
+            label.setText(propertyDetails);
         } else {
             label.setText("Next Pending Property: None");
         }
     }
+
 
     // Show error message
     private void showError(String message) {

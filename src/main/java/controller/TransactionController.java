@@ -56,10 +56,10 @@ public class TransactionController {
     // Add a new transaction when a customer buys a property
     public void addTransaction(Property property) {
         Transaction transaction = new Transaction(
-            property.getProjectName(),
-            property.getAddress(),
-            String.valueOf(property.getSize()),  // Convert size to string
-            property.getPrice()
+                property.getProjectName(),
+                "\"" + property.getAddress() + "\"",  // Add quotes around address
+                String.valueOf(property.getSize()),    // Convert size to string
+                property.getPrice()
         );
 
         fileHandler.addTransactionToCSV(transaction);  // Add the new transaction to the file
