@@ -5,7 +5,9 @@ import model.Transaction;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 public class FileHandler {
@@ -116,21 +118,38 @@ public class FileHandler {
         // Remove the purchased property
         properties.removeIf(p -> p.getAddress().equals(property.getAddress()));
 
-        // Write the remaining properties back to the CSV
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(propertiesCSVPath, false))) {
-            // Write header
-            bw.write("DateOfValuation,SizeSqM,SizeSqFt,Facilities,NoOfFloors,Address,ProjectName,Price,Year,PricePerSqFt,SellerUsername");
-            bw.newLine();
+        // Save the properties back to the file
+        savePropertiesToFile(properties);
 
-            for (Property p : properties) {
-                bw.write(p.getSize() + "," + p.getPrice() + "," + p.getFacilities() + "," +
-                         p.getProjectName() + "," + p.getAddress() + "," + p.getSellerUsername());
-                bw.newLine();
-            }
-        } catch (IOException e) {
-            logger.severe("Error saving properties: " + e.getMessage());
-        }
+        // Call method to remove any duplicates in the CSV twice for safety
+        removeDuplicatesFromCSV();
+        removeDuplicatesFromCSV(); // Second pass to ensure all duplicates are removed
     }
+
+    // This method will remove duplicated entries in the CSV
+    private void removeDuplicatesFromCSV() {
+        List<Property> properties = loadPropertiesFromCSV();  // Load all properties
+
+        // Create a list to store unique properties
+        List<Property> uniqueProperties = new ArrayList<>();
+
+        // Use a set to keep track of seen addresses (or other fields to identify uniqueness)
+        Set<String> seenAddresses = new HashSet<>();
+
+        for (Property property : properties) {
+            // Check if the property address has already been processed
+            if (!seenAddresses.contains(property.getAddress())) {
+                // Add to the unique list and mark the address as processed
+                uniqueProperties.add(property);
+                seenAddresses.add(property.getAddress());
+            }
+        }
+
+        // Now save the unique properties back to the CSV file
+        savePropertiesToFile(uniqueProperties);
+    }
+
+
 
     // Add a new transaction to the CSV
     public void addTransactionToCSV(Transaction transaction) {

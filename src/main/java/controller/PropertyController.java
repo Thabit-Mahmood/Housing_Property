@@ -33,16 +33,31 @@ public class PropertyController {
     }
 
     // Method to remove a property and update the CSV file
+
+    // Method to remove a property and update the CSV file
     public void removeProperty(Property property) {
-        // Load all properties from the file
-        List<Property> properties = fileHandler.loadPropertiesFromCSV();
+        // Ensure no duplicates are in the loaded properties
+        properties = properties.stream().distinct().collect(Collectors.toList());
 
         // Remove the selected property from the list
         properties.removeIf(p -> p.getAddress().equals(property.getAddress())
                 && p.getProjectName().equals(property.getProjectName())
                 && p.getPrice() == property.getPrice());
 
-        // Save the updated list back to the CSV file
+        // Save the updated list back to the CSV file without duplicates
+        fileHandler.savePropertiesToFile(properties);
+
+        // Call method to remove any remaining duplicates (if needed)
+        removeDuplicates();
+    }
+
+    // Method to remove any duplicates after saving properties
+    private void removeDuplicates() {
+        properties = properties.stream()
+                .distinct() // Ensure each property is unique based on its data
+                .collect(Collectors.toList());
+
+        // Save the cleaned list back to the CSV file
         fileHandler.savePropertiesToFile(properties);
     }
 
