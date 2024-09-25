@@ -6,7 +6,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Box;
 import javafx.stage.Stage;
 import model.Property;
 import model.Transaction;
@@ -30,6 +29,7 @@ public class CustomerDashboardView {
     }
 
     // Display the customer dashboard
+    @SuppressWarnings("unchecked")
     public void displayCustomerDashboard(Stage primaryStage) {
         primaryStage.setTitle("Customer Dashboard");
 
