@@ -108,6 +108,27 @@ public class CustomerDashboardView {
             }
         });
 
+        // Buy Property button
+        Button buyPropertyButton = new Button("Buy Property");
+
+        // Handle buying the selected property
+        buyPropertyButton.setOnAction(e -> {
+            Property selectedProperty = propertyTableView.getSelectionModel().getSelectedItem();
+            if (selectedProperty != null) {
+                // Add transaction
+                transactionController.addTransaction(selectedProperty);
+
+                // Remove the purchased property from the available list
+                propertyController.removeProperty(selectedProperty);
+
+                // Update the view
+                propertyTableView.getItems().remove(selectedProperty);
+                showSuccess("Property purchased successfully!");
+            } else {
+                showError("Please select a property to buy.");
+            }
+        });
+
         // View transaction history button
         Button viewTransactionHistoryButton = new Button("View Transaction History");
         ListView<String> transactionListView = new ListView<>();
@@ -135,7 +156,7 @@ public class CustomerDashboardView {
 
         VBox layout = new VBox(10);
         layout.getChildren().addAll(minPriceInput, maxPriceInput, minSizeInput, maxSizeInput, projectNameDropdown,
-                locationInput, facilitiesInput, searchButton, propertyTableView, viewTransactionHistoryButton,
+                locationInput, facilitiesInput, searchButton, propertyTableView, buyPropertyButton, viewTransactionHistoryButton,
                 transactionListView);
 
         Scene scene = new Scene(layout, 800, 600);
@@ -148,6 +169,14 @@ public class CustomerDashboardView {
         alert.setTitle("Error");
         alert.setHeaderText(null);
         alert.setContentText(errorMessage);
+        alert.showAndWait();
+    }
+
+    private void showSuccess(String successMessage) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Success");
+        alert.setHeaderText(null);
+        alert.setContentText(successMessage);
         alert.showAndWait();
     }
 }

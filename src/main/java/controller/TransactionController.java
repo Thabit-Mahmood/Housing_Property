@@ -3,6 +3,7 @@ package controller;
 import model.Transaction;
 import services.FileHandler;
 import view.TransactionView;
+import model.Property;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,6 +51,18 @@ public class TransactionController {
         // Return the last 'limit' number of transactions
         int transactionCount = projectTransactions.size();
         return projectTransactions.subList(Math.max(transactionCount - limit, 0), transactionCount);
+    }
+
+    // Add a new transaction when a customer buys a property
+    public void addTransaction(Property property) {
+        Transaction transaction = new Transaction(
+            property.getProjectName(),
+            property.getAddress(),
+            String.valueOf(property.getSize()),  // Convert size to string
+            property.getPrice()
+        );
+
+        fileHandler.addTransactionToCSV(transaction);  // Add the new transaction to the file
     }
 
 }

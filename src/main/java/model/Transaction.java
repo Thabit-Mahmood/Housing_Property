@@ -6,6 +6,7 @@ public class Transaction {
     private String size;
     private double price;
 
+    // Constructor
     public Transaction(String projectName, String address, String size, double price) {
         this.projectName = projectName;
         this.address = address;
@@ -13,6 +14,7 @@ public class Transaction {
         this.price = price;
     }
 
+    // Getters
     public String getProjectName() {
         return projectName;
     }
@@ -31,9 +33,6 @@ public class Transaction {
 
     @Override
     public String toString() {
-        return "Project: " + projectName +
-               ", Address: " + address +
-               ", Size: " + size + " sq ft" +
-               ", Price: $" + String.format("%,.2f", price);
+        return projectName + ",\"" + address + "\"," + size + "," + price;
     }
 }

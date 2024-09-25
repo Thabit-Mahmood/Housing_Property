@@ -21,6 +21,7 @@ public class PropertyController {
         this.projects = new ArrayList<>();
         this.fileHandler = FileHandler.getInstance();
         this.approvalService = PropertyApprovalService.getInstance();
+        this.properties = fileHandler.loadPropertiesFromCSV(); // Load approved properties from CSV
 
         // Load properties from CSV
         this.properties = fileHandler.loadPropertiesFromCSV();
@@ -31,6 +32,20 @@ public class PropertyController {
         for (Property property : properties) {
             System.out.println(property.getAddress() + " - " + property.getPrice() + " - " + property.getSize());
         }
+    }
+
+    // Method to remove a property and update the CSV file
+    public void removeProperty(Property property) {
+        // Load all properties from the file
+        List<Property> properties = fileHandler.loadPropertiesFromCSV();
+
+        // Remove the selected property from the list
+        properties.removeIf(p -> p.getAddress().equals(property.getAddress())
+                && p.getProjectName().equals(property.getProjectName())
+                && p.getPrice() == property.getPrice());
+
+        // Save the updated list back to the CSV file
+        fileHandler.savePropertiesToFile(properties);
     }
 
     // Method for adding a new property (used by sellers)
@@ -47,7 +62,7 @@ public class PropertyController {
     // Associate property with seller after approval
     public void addPropertyToSeller(Seller seller, Property property) {
         seller.addProperty(property); // Add property to seller's list after admin approval
-        saveAllProperties();  // Save all approved properties
+        saveAllProperties(); // Save all approved properties
     }
 
     // Method for submitting a property for approval by a seller
@@ -59,13 +74,13 @@ public class PropertyController {
 
     // Method to get the list of pending properties
     public List<Property> getPendingProperties() {
-        return approvalService.getPendingProperties();  // Get all pending properties
+        return approvalService.getPendingProperties(); // Get all pending properties
     }
 
     // Get all properties owned by a specific seller
     public List<Property> getSellerProperties(Seller seller) {
         // Load the approved properties from the CSV file
-        this.properties = fileHandler.loadPropertiesFromCSV();  // Load approved properties from CSV
+        this.properties = fileHandler.loadPropertiesFromCSV(); // Load approved properties from CSV
         return properties.stream()
                 .filter(property -> property.getSellerUsername().equals(seller.getUsername()))
                 .collect(Collectors.toList());
@@ -74,7 +89,7 @@ public class PropertyController {
     // Initialize properties from CSV
     @SuppressWarnings("unused")
     private void initializePropertiesFromCSV() {
-        this.properties = fileHandler.loadPropertiesFromCSV();  // Load approved properties from CSV
+        this.properties = fileHandler.loadPropertiesFromCSV(); // Load approved properties from CSV
         for (Property property : properties) {
             Project project = getProjectByName(property.getProjectName());
             if (project != null) {
@@ -99,7 +114,7 @@ public class PropertyController {
 
     // Method to filter properties based on criteria, including facilities
     public List<Property> searchPropertiesByCriteria(double minPrice, double maxPrice, double minSize, double maxSize,
-                                                     String location, String projectName, String facilities) {
+            String location, String projectName, String facilities) {
         // Debugging the input criteria
         System.out.println("Search Criteria - Min Price: " + minPrice + ", Max Price: " + maxPrice +
                 ", Min Size: " + minSize + ", Max Size: " + maxSize +
@@ -109,9 +124,13 @@ public class PropertyController {
         List<Property> filteredProperties = properties.stream()
                 .filter(property -> property.getPrice() >= minPrice && property.getPrice() <= maxPrice)
                 .filter(property -> property.getSize() >= minSize && property.getSize() <= maxSize)
-                .filter(property -> location.isEmpty() || property.getAddress().toLowerCase().contains(location.toLowerCase()))
-                .filter(property -> projectName == null || projectName.isEmpty() || property.getProjectName().equalsIgnoreCase(projectName))
-                .filter(property -> facilities.isEmpty() || property.getFacilities().toLowerCase().contains(facilities.toLowerCase()))  // Facilities filtering
+                .filter(property -> location.isEmpty()
+                        || property.getAddress().toLowerCase().contains(location.toLowerCase()))
+                .filter(property -> projectName == null || projectName.isEmpty()
+                        || property.getProjectName().equalsIgnoreCase(projectName))
+                .filter(property -> facilities.isEmpty()
+                        || property.getFacilities().toLowerCase().contains(facilities.toLowerCase())) // Facilities
+                                                                                                      // filtering
                 .collect(Collectors.toList());
 
         System.out.println("Filtered Properties: " + filteredProperties.size());

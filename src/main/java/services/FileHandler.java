@@ -92,7 +92,7 @@ public class FileHandler {
         return transactions;
     }
 
-    // Save transactions to the CSV file
+    // Save transactions to the CSV file in the correct format
     public void saveTransactionsToCSV(List<Transaction> transactions) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(transactionsCSVPath, false))) {
             // Write header
@@ -100,7 +100,7 @@ public class FileHandler {
             bw.newLine();
 
             for (Transaction transaction : transactions) {
-                bw.write(transaction.getProjectName() + "," + transaction.getAddress() + "," +
+                bw.write(transaction.getProjectName() + ",\"" + transaction.getAddress() + "\"," +
                         transaction.getSize() + "," + transaction.getPrice());
                 bw.newLine();
             }
@@ -109,23 +109,73 @@ public class FileHandler {
         }
     }
 
-    // Save properties to the CSV file (for writing approved properties to CSV)
-    public void savePropertiesToFile(List<Property> properties) {
+    // Remove a property from the CSV
+    public void removePropertyFromCSV(Property property) {
+        List<Property> properties = loadPropertiesFromCSV();  // Load all properties
+
+        // Remove the purchased property
+        properties.removeIf(p -> p.getAddress().equals(property.getAddress()));
+
+        // Write the remaining properties back to the CSV
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(propertiesCSVPath, false))) {
             // Write header
-            bw.write(
-                    "DateOfValuation,SizeSqM,SizeSqFt,Facilities,NoOfFloors,Address,ProjectName,Price,Year,PricePerSqFt,SellerUsername");
+            bw.write("DateOfValuation,SizeSqM,SizeSqFt,Facilities,NoOfFloors,Address,ProjectName,Price,Year,PricePerSqFt,SellerUsername");
             bw.newLine();
 
-            for (Property property : properties) {
-                bw.write(property.getSize() + "," + property.getPrice() + "," + property.getFacilities() + "," +
-                        property.getProjectName() + "," + property.getAddress() + "," + property.getSellerUsername());
+            for (Property p : properties) {
+                bw.write(p.getSize() + "," + p.getPrice() + "," + p.getFacilities() + "," +
+                         p.getProjectName() + "," + p.getAddress() + "," + p.getSellerUsername());
                 bw.newLine();
             }
         } catch (IOException e) {
             logger.severe("Error saving properties: " + e.getMessage());
         }
     }
+
+    // Add a new transaction to the CSV
+    public void addTransactionToCSV(Transaction transaction) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(transactionsCSVPath, true))) {
+            bw.write(transaction.getProjectName() + "," + transaction.getAddress() + "," +
+                     transaction.getSize() + "," + transaction.getPrice());
+            bw.newLine();
+        } catch (IOException e) {
+            logger.severe("Error saving transaction: " + e.getMessage());
+        }
+    }
+
+    public void savePropertiesToFile(List<Property> properties) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(propertiesCSVPath, false))) {
+            // Write the correct header
+            bw.write("DateOfValuation,Size SqM,SqFt,PropertyType,NoOfFloors,ADDRESS,SCHEME,PRICE,YEAR,pricePerSqft,Seller");
+            bw.newLine();
+    
+            for (Property property : properties) {
+                String dateOfValuation = property.getDateOfValuation() != null ? property.getDateOfValuation() : "N/A";
+                String noOfFloors = property.getNoOfFloors() != null ? property.getNoOfFloors() : "N/A";
+                String year = property.getYear() != null ? property.getYear() : "N/A";
+                String pricePerSqFt = property.getPricePerSqFt() != null ? property.getPricePerSqFt() : "N/A";
+    
+                // Format each line properly based on its type
+                bw.write(String.format(
+                        "%s,%.2f,%.2f,%s,%s,\"%s\",%s,%.2f,%s,%s,%s",
+                        dateOfValuation,                   // String for DateOfValuation
+                        property.getSize() / 10.7639,      // Convert SqFt to SqM
+                        property.getSize(),                // SqFt
+                        property.getFacilities(),          // String for PropertyType (Facilities)
+                        noOfFloors,                        // String for NoOfFloors
+                        property.getAddress(),             // String for Address
+                        property.getProjectName(),         // String for Scheme (Project Name)
+                        property.getPrice(),               // Double for Price
+                        year,                              // String for Year
+                        pricePerSqFt,                      // String for pricePerSqft
+                        property.getSellerUsername()       // String for SellerUsername
+                ));
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            logger.severe("Error saving properties: " + e.getMessage());
+        }
+    }    
 
     // Save pending property to file with seller association
     public void savePendingPropertyToCSV(Property property) {
@@ -181,6 +231,11 @@ public class FileHandler {
                         // Create Property object with the parsed data
                         Property property = new Property(sizeSqFt, price, propertyType, projectName, address);
                         property.setSellerUsername(sellerUsername);
+                        properties.add(property);
+                        property.setDateOfValuation(dateOfValuation);  // Set the DateOfValuation
+                        property.setNoOfFloors(noOfFloors);            // Set the number of floors
+                        property.setYear(year);                        // Set the year
+                        property.setPricePerSqFt(pricePerSqFt);        // Set the price per SqFt
                         properties.add(property);
 
                     } catch (NumberFormatException e) {
